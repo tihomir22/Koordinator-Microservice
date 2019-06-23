@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,12 +28,12 @@ public class ControladorPrecios {
     }
 
     @GetMapping("/{parbase}/{parcontra}")
-    public Optional<PrecioActivo> recuperarPrecioActivo(@PathVariable("parbase")String id,@PathVariable("parcontra")String id2) throws ChangeSetPersister.NotFoundException {
+    public Optional<PrecioActivo> recuperarPrecioActivo(@PathVariable("parbase")String id,@PathVariable("parcontra")String id2) throws ChangeSetPersister.NotFoundException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Optional<PrecioActivo> res=this.repositorioActivos.findById(id+id2);
         if(res.isPresent()){
             return res;
         }else{
-           Optional<PrecioActivo> resOpt= Optional.ofNullable(this.peticionesTerceros.getLivePriceRapidApi(id.toUpperCase(), id2.toUpperCase()));
+           Optional<PrecioActivo> resOpt= Optional.ofNullable(this.peticionesTerceros.getCryptoCompareApi(id.toUpperCase(), id2.toUpperCase()));
             if(resOpt.isPresent()){
                 this.repositorioActivos.save(resOpt.get());
                 return resOpt;

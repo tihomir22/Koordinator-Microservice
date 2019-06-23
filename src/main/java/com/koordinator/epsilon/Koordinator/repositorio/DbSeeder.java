@@ -32,18 +32,19 @@ public class DbSeeder implements CommandLineRunner {
     private void recogerYActualizarPreciosMongo() throws ExecutionException, InterruptedException {
 
         while(true) {
-            Thread.sleep(60000);
+            Thread.sleep(10000);
             List<PrecioActivo> arrayActivosMongo = this.repositorioActivos.findAll();
             for (int i = 0; i < arrayActivosMongo.size(); i++) {
                 this.recuperarPrecioAsincrono(arrayActivosMongo.get(i));
             }
+            System.out.println("Actualizacion realizada");
         }
 
     }
 
     @Async
     private void recuperarPrecioAsincrono(PrecioActivo precioActivo) throws ExecutionException, InterruptedException {
-        CompletableFuture completableFuture= CompletableFuture.completedFuture(this.peticionesTerceros.getLivePriceRapidApi(precioActivo.getParBase(),precioActivo.getParContra()));
+        CompletableFuture completableFuture= CompletableFuture.completedFuture(this.peticionesTerceros.getCryptoCompareApi(precioActivo.getParBase(),precioActivo.getParContra()));
         completableFuture.join();
         PrecioActivo precioActivoRes= (PrecioActivo) completableFuture.get();
         this.repositorioActivos.save(precioActivoRes);
