@@ -1,29 +1,22 @@
 package com.koordinator.epsilon.Koordinator.servicios;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.jsonpath.JsonPath;
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
+import com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas;
+import com.koordinator.epsilon.Koordinator.entidades.DatoHistorico;
 import com.koordinator.epsilon.Koordinator.entidades.PrecioActivo;
 import com.koordinator.epsilon.Koordinator.entidades.RapidApiPrecio;
-import net.minidev.json.JSONObject;
-import org.apache.commons.beanutils.BeanUtils;
+import com.koordinator.epsilon.Koordinator.entidades.TipoDatoHistorico;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import javax.swing.text.html.Option;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class PeticionesTerceros {
@@ -65,10 +58,56 @@ public class PeticionesTerceros {
         }catch (NullPointerException ex){
             throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase()+"/"+parContra.toUpperCase()+" no existe");
         }
-
     }
 
+    public PrecioActivo getBinanceTicker(String parBase, String parContra) {
+        try {
+            final String uri = "https://api.binance.com/api/v3/ticker/price?symbol="+parBase.toUpperCase()+parContra.toUpperCase();
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>("body", headers);
+            ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
+            JsonNode highDepth = respEntity2.getBody().get("price");
+            if (!highDepth.isNull()) {
+                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), parBase, parContra);
+            } else {
+                return null;
+            }
+        }catch (NullPointerException ex){
+            throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase()+"/"+parContra.toUpperCase()+" no existe");
+        }
+    }
 
+    public TipoDatoHistorico recibirHistoricoActivo(String parBase,String parContra,String intervalo) throws ActivoNoEncontradoException, JSONException {
+        if(!ValidacionesEstaticas.esIntervaloDeBinance(intervalo)){
+            throw new ActivoNoEncontradoException("El intervalo introducido "+intervalo+" no es correcto!");
+        }
+        final String uri = "https://api.binance.com/api/v1/klines?symbol="+parBase.toUpperCase()+parContra.toUpperCase()+"&interval="+intervalo;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
+        ResponseEntity<Object> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, Object.class);
+        ArrayList<TipoDatoHistorico>listaDatosHistoricos=new ArrayList<>();
+        JSONArray jsonarray = new JSONArray(respEntity2.getBody().toString());
+        TipoDatoHistorico tipoDatoHistorico=new TipoDatoHistorico();
+        ArrayList<DatoHistorico>lista=new ArrayList<>();
+        tipoDatoHistorico.setPeriodo(intervalo);
+        for (int i = 0; i < jsonarray.length(); i++) {
+            Object objeto=jsonarray.get(i);
+            String base=objeto.toString().substring(1,objeto.toString().length()-1);
+            String baseOpenTime=base.split(",")[0];
+            String baseOpen=base.split(",")[1];
+            String baseHigh=base.split(",")[2];
+            String baseLow=base.split(",")[3];
+            String baseClose=base.split(",")[4];
+            String baseVolumen=base.split(",")[5];
+            DatoHistorico dato=new DatoHistorico(baseOpenTime,Double.parseDouble(baseOpen),Double.parseDouble(baseHigh),Double.parseDouble(baseLow),Double.parseDouble(baseClose),Double.parseDouble(baseVolumen));
+            lista.add(dato);
+        }
+        tipoDatoHistorico.setDato(lista);
+        tipoDatoHistorico.setNumRegistros(lista.size());
+        return tipoDatoHistorico;
+    }
 
 }
 

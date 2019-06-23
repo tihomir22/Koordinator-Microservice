@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+
 @Document(collection = "PreciosActivos")
 public class PrecioActivo {
     //compuesto por dos activos
     @Id
     private String id;
     private double precio;
+    private ArrayList<TipoDatoHistorico> listaDatosHora=new ArrayList<>();
     @JsonIgnore
     private String parBase;
     @JsonIgnore
@@ -32,9 +35,18 @@ public class PrecioActivo {
         return "PrecioActivo{" +
                 "id='" + id + '\'' +
                 ", precio=" + precio +
+                ", listaDatosHora=" + listaDatosHora +
                 ", parBase='" + parBase + '\'' +
                 ", parContra='" + parContra + '\'' +
                 '}';
+    }
+
+    public ArrayList<TipoDatoHistorico> getListaDatosHora() {
+        return listaDatosHora;
+    }
+
+    public void setListaDatosHora(ArrayList<TipoDatoHistorico> listaDatosHora) {
+        this.listaDatosHora = listaDatosHora;
     }
 
     public String getId() {
