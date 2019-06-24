@@ -43,7 +43,7 @@ public class DbSeeder implements CommandLineRunner {
 
     @Async
     private void recuperarPrecioAsincrono(PrecioActivo precioActivo) throws ExecutionException, InterruptedException {
-        CompletableFuture completableFuture= CompletableFuture.completedFuture(this.peticionesTerceros.getBinanceTicker(precioActivo.getParBase(),precioActivo.getParContra()));
+        CompletableFuture completableFuture= CompletableFuture.completedFuture(this.peticionesTerceros.updateBinanceTicker(precioActivo));
         completableFuture.join();
         PrecioActivo precioActivoRes= (PrecioActivo) completableFuture.get();
         this.repositorioActivos.save(precioActivoRes);

@@ -22,21 +22,20 @@ import java.util.*;
 public class PeticionesTerceros {
 
 
-    public PrecioActivo getLivePriceRapidApi(String parBase, String parContra)
-    {
-        final String uri = "https://bravenewcoin-v1.p.rapidapi.com/convert?qty=1&from="+parBase.toLowerCase()+"&to="+parContra.toLowerCase();
+    public PrecioActivo getLivePriceRapidApi(String parBase, String parContra) {
+        final String uri = "https://bravenewcoin-v1.p.rapidapi.com/convert?qty=1&from=" + parBase.toLowerCase() + "&to=" + parContra.toLowerCase();
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-RapidAPI-Host","bravenewcoin-v1.p.rapidapi.com");
-        headers.set("X-RapidAPI-Key","43e75f11e6msh3b0e1b3d9f97b63p1c4c8fjsn357e56bca235");
+        headers.set("X-RapidAPI-Host", "bravenewcoin-v1.p.rapidapi.com");
+        headers.set("X-RapidAPI-Key", "43e75f11e6msh3b0e1b3d9f97b63p1c4c8fjsn357e56bca235");
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
 
-        ResponseEntity<RapidApiPrecio> respEntity2=restTemplate.exchange(uri, HttpMethod.GET, entity, RapidApiPrecio.class);
-        if(respEntity2.getBody().isSuccess()){
-            PrecioActivo returnValue=new PrecioActivo(parBase+parContra,respEntity2.getBody().getTo_quantity(),parBase,parContra);
+        ResponseEntity<RapidApiPrecio> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, RapidApiPrecio.class);
+        if (respEntity2.getBody().isSuccess()) {
+            PrecioActivo returnValue = new PrecioActivo(parBase + parContra, respEntity2.getBody().getTo_quantity(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
             return returnValue;
-        }else{
+        } else {
             return null;
         }
 
@@ -51,31 +50,51 @@ public class PeticionesTerceros {
             ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
             JsonNode highDepth = respEntity2.getBody().get(parBase).get(parContra);
             if (!highDepth.isNull()) {
-                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), parBase, parContra);
+                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
             } else {
                 return null;
             }
-        }catch (NullPointerException ex){
-            throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase()+"/"+parContra.toUpperCase()+" no existe");
+        } catch (NullPointerException ex) {
+            throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase() + "/" + parContra.toUpperCase() + " no existe");
         }
     }
 
     public PrecioActivo getBinanceTicker(String parBase, String parContra) {
         try {
-            final String uri = "https://api.binance.com/api/v3/ticker/price?symbol="+parBase.toUpperCase()+parContra.toUpperCase();
+            final String uri = "https://api.binance.com/api/v3/ticker/price?symbol=" + parBase.toUpperCase() + parContra.toUpperCase();
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<String> entity = new HttpEntity<>("body", headers);
             ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
             JsonNode highDepth = respEntity2.getBody().get("price");
             if (!highDepth.isNull()) {
-                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), parBase, parContra);
+                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
             } else {
                 return null;
             }
-        }catch (NullPointerException ex){
-            throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase()+"/"+parContra.toUpperCase()+" no existe");
+        } catch (NullPointerException ex) {
+            throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase() + "/" + parContra.toUpperCase() + " no existe");
         }
+    }
+
+    public PrecioActivo updateBinanceTicker(PrecioActivo precioActivo) {
+        try {
+            final String uri = "https://api.binance.com/api/v3/ticker/price?symbol=" + precioActivo.getParBase().toUpperCase() + precioActivo.getParContra().toUpperCase();
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<>("body", headers);
+            ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
+            JsonNode highDepth = respEntity2.getBody().get("price");
+            if (!highDepth.isNull()) {
+                precioActivo.setPrecio(highDepth.asDouble());
+                return precioActivo;
+            } else {
+                return null;
+            }
+        } catch (NullPointerException ex) {
+            throw new ActivoNoEncontradoException("El activo " + precioActivo.getParBase().toUpperCase() + "/" + precioActivo.getParContra().toUpperCase() + " no existe");
+        }
+
     }
 
     public TipoDatoHistorico recibirHistoricoActivo(String parBase,String parContra,String intervalo) throws ActivoNoEncontradoException, JSONException {
@@ -108,6 +127,7 @@ public class PeticionesTerceros {
         tipoDatoHistorico.setNumRegistros(lista.size());
         return tipoDatoHistorico;
     }
+
 
 }
 

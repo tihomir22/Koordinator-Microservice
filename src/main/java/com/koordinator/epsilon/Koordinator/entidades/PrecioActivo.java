@@ -20,9 +20,10 @@ public class PrecioActivo {
     private String parContra;
 
 
-    public PrecioActivo(String id, double precio, String parBase, String parContra) {
+    public PrecioActivo(String id, double precio, ArrayList<TipoDatoHistorico> listaDatosHora, String parBase, String parContra) {
         this.id = id;
         this.precio = precio;
+        this.listaDatosHora = listaDatosHora;
         this.parBase = parBase;
         this.parContra = parContra;
     }
