@@ -1,6 +1,7 @@
 package com.koordinator.epsilon.Koordinator.controladores;
 
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
+import com.koordinator.epsilon.Koordinator.StaticTools;
 import com.koordinator.epsilon.Koordinator.entidades.DatoHistorico;
 import com.koordinator.epsilon.Koordinator.entidades.PrecioActivo;
 import com.koordinator.epsilon.Koordinator.entidades.TipoDatoHistorico;
@@ -59,7 +60,10 @@ public class ControladorPrecios {
             if(lista==null){
                 lista=new ArrayList<TipoDatoHistorico>();
             }
-            lista.add(resOpt.get());
+            int resBusqueda=StaticTools.buscarIntervalo(lista,intervalo);
+            if(resBusqueda!=-1){
+                lista.set(resBusqueda,resOpt.get());
+            }else{lista.add(resOpt.get());}
             res.get().setListaDatosHora(lista);
             this.repositorioActivos.save(res.get());
             return resOpt;

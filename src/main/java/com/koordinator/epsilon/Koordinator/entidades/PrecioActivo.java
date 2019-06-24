@@ -13,6 +13,7 @@ public class PrecioActivo {
     @Id
     private String id;
     private double precio;
+    @JsonIgnore
     private ArrayList<TipoDatoHistorico> listaDatosHora=new ArrayList<>();
     @JsonIgnore
     private String parBase;
