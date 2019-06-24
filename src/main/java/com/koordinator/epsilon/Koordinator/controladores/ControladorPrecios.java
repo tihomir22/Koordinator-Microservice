@@ -50,6 +50,8 @@ public class ControladorPrecios {
 
     @GetMapping("historic/{parbase}/{parcontra}/{interval}")
     public Optional<TipoDatoHistorico> recuperarHistoricoActivo(@PathVariable("parbase")String id, @PathVariable("parcontra")String id2, @PathVariable("interval")String intervalo) throws IOException, JSONException {
+        id=id.toUpperCase();
+        id2=id2.toUpperCase();
         Optional<PrecioActivo> res = this.repositorioActivos.findById(id + id2);
         Optional<TipoDatoHistorico> resOpt = Optional.ofNullable(this.peticionesTerceros.recibirHistoricoActivo(id, id2, intervalo));
         if (resOpt.isPresent() && res.isPresent()) {
