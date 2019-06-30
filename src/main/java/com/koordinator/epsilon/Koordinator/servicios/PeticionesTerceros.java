@@ -2,13 +2,13 @@ package com.koordinator.epsilon.Koordinator.servicios;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
+import com.koordinator.epsilon.Koordinator.StaticTools;
 import com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas;
-import com.koordinator.epsilon.Koordinator.entidades.DatoHistorico;
-import com.koordinator.epsilon.Koordinator.entidades.PrecioActivo;
-import com.koordinator.epsilon.Koordinator.entidades.RapidApiPrecio;
-import com.koordinator.epsilon.Koordinator.entidades.TipoDatoHistorico;
+import com.koordinator.epsilon.Koordinator.entidades.*;
+import com.koordinator.epsilon.Koordinator.repositorio.RepositorioActivos;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +20,30 @@ import java.util.*;
 
 @Service
 public class PeticionesTerceros {
+    @Autowired
+    private RepositorioActivos repositorioActivos;
+
+    public ArrayList<RegistroTecnico> calcularSMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
+
+        ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
+
+        ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
+
+        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
+        ArrayList<RegistroTecnico> res;
+        if (resBusquedaIndicador == -1) {
+            List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
+            double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
+            res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
+            IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
+            lista.add(indicadorTecnico);
+            resActivo.setListadoIndicatores(lista);
+            this.repositorioActivos.save(resActivo);
+        }else{
+            res=resActivo.getListadoIndicatores().get(resBusquedaIndicador).getDatosTecnicos();
+        }
+        return res;
+    }
 
 
     public PrecioActivo getLivePriceRapidApi(String parBase, String parContra) {

@@ -19,7 +19,18 @@ public class PrecioActivo {
     private String parBase;
     @JsonIgnore
     private String parContra;
+    @JsonIgnore
+    private ArrayList<IndicadorTecnico>listadoIndicatores=new ArrayList<>();
 
+
+    public PrecioActivo(String id, double precio, ArrayList<TipoDatoHistorico> listaDatosHora, String parBase, String parContra, ArrayList<IndicadorTecnico> listadoIndicatores) {
+        this.id = id;
+        this.precio = precio;
+        this.listaDatosHora = listaDatosHora;
+        this.parBase = parBase;
+        this.parContra = parContra;
+        this.listadoIndicatores = listadoIndicatores;
+    }
 
     public PrecioActivo(String id, double precio, ArrayList<TipoDatoHistorico> listaDatosHora, String parBase, String parContra) {
         this.id = id;
@@ -47,8 +58,16 @@ public class PrecioActivo {
         return listaDatosHora;
     }
 
+    public void modificarItemTipoHistoricoLista(int indice,TipoDatoHistorico item){
+        this.listaDatosHora.set(indice,item);
+    }
+
     public void setListaDatosHora(ArrayList<TipoDatoHistorico> listaDatosHora) {
         this.listaDatosHora = listaDatosHora;
+    }
+
+    public void setListaIndicatoresTecnicos(ArrayList<IndicadorTecnico>listadoIndicatores){
+        this.listadoIndicatores=listadoIndicatores;
     }
 
     public String getId() {
@@ -81,5 +100,13 @@ public class PrecioActivo {
 
     public void setParContra(String parContra) {
         this.parContra = parContra;
+    }
+
+    public ArrayList<IndicadorTecnico> getListadoIndicatores() {
+        return listadoIndicatores;
+    }
+
+    public void setListadoIndicatores(ArrayList<IndicadorTecnico> listadoIndicatores) {
+        this.listadoIndicatores = listadoIndicatores;
     }
 }
