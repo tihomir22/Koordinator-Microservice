@@ -62,6 +62,10 @@ public class PrecioActivo {
         this.listaDatosHora.set(indice,item);
     }
 
+    public void modificarIndicadorTecnico(int indice,IndicadorTecnico indicador){
+        this.listadoIndicatores.set(indice,indicador);
+    }
+
     public void setListaDatosHora(ArrayList<TipoDatoHistorico> listaDatosHora) {
         this.listaDatosHora = listaDatosHora;
     }

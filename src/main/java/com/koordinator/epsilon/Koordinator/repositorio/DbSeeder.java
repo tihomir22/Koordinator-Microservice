@@ -57,7 +57,9 @@ public class DbSeeder implements CommandLineRunner {
                 if (indicadorTecnico.getIndicatorName().equalsIgnoreCase("sma")) {
                     int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
                     if (resIntervalo != -1) {
-                        this.peticionesTerceros.calcularSMA(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries());
+                        indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularSMA(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
+                        precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
+                        this.repositorioActivos.save(precioActivo);
                     }
                 }
             }
