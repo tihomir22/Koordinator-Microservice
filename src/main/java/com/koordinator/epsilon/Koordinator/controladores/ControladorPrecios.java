@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.*;
 
 @RestController
+@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
 public class ControladorPrecios {
     @Autowired
     private RepositorioActivos repositorioActivos;
