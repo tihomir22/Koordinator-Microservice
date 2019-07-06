@@ -2,19 +2,21 @@ package com.koordinator.epsilon.Koordinator.controladores;
 
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
 import com.koordinator.epsilon.Koordinator.StaticTools;
+import com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas;
 import com.koordinator.epsilon.Koordinator.entidades.*;
 import com.koordinator.epsilon.Koordinator.repositorio.RepositorioActivos;
 import com.koordinator.epsilon.Koordinator.servicios.PeticionesTerceros;
 import com.koordinator.epsilon.Koordinator.servicios.TALibDemo;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.*;
 
 @RestController
-@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 public class ControladorPrecios {
     @Autowired
     private RepositorioActivos repositorioActivos;
@@ -75,28 +77,31 @@ public class ControladorPrecios {
         }
     }
 
-    @GetMapping("technical/{nombreIndicador}/{parbase}/{parcontra}/{interval}/{periodoTiempo}/{tipoSeries}")
-    public ArrayList<RegistroTecnico> recuperarSMA(@PathVariable("parbase") String id,
-                                                   @PathVariable("parcontra") String id2,
-                                                   @PathVariable("nombreIndicador") String nombreIndicador,
-                                                   @PathVariable("interval") String intervaloDatosHistoricos,
-                                                   @PathVariable("periodoTiempo") int periodoTiempo,
-                                                   @PathVariable("tipoSeries") String tipoSeries) throws IOException, JSONException {
-        id = id.toUpperCase();
-        id2 = id2.toUpperCase();
-        nombreIndicador=nombreIndicador.toUpperCase();
-        Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(id + id2);
-        if (resActivo.isPresent()) {
-            Optional<TipoDatoHistorico> historico = this.recuperarHistoricoActivo(id, id2, intervaloDatosHistoricos);
-            if(historico.isPresent()){
-              return this.peticionesTerceros.calcularSMA(historico.get(),resActivo.get(),nombreIndicador,periodoTiempo,intervaloDatosHistoricos,tipoSeries);
-            }else{
-                return null;
-            }
-        } else {
-            throw new ActivoNoEncontradoException("El par " + id + id2 + " no existe");
-        }
 
+    @GetMapping("technical/sma/**")
+    public ArrayList<RegistroTecnico> recuperarSMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
+        if(ValidacionesEstaticas.validacionSMA(queryParameters)){
+            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            if (resActivo.isPresent()) {
+                Optional<TipoDatoHistorico> historico = this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico));
+                return historico.map(tipoDatoHistorico -> this.peticionesTerceros.calcularSMA(tipoDatoHistorico, resActivo.get(), "sma",Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null);
+            } else {
+                throw new ActivoNoEncontradoException("El par " + queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase() + " no existe");
+            }
+        }
+        return null;
+    }
+
+    @GetMapping("technical/ema/**")
+    public ArrayList<RegistroTecnico> recuperarEMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
+        if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
+            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            if (resActivo.isPresent()) {
+                Optional<TipoDatoHistorico> historico = this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico));
+                return historico.map(tipoDatoHistorico -> this.peticionesTerceros.calcularEMA(tipoDatoHistorico, resActivo.get(), "ema",Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null);
+            }
+        }
+        return null;
     }
 
 

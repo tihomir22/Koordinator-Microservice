@@ -66,6 +66,18 @@ public class TALibDemo  {
         return simpleMovingAverageCall(periodoTiempo);
     }
 
+    public static ArrayList<RegistroTecnico> ejecutarOperacionEMA(double[] list, int periodoTiempo){
+        close=list;
+        lib = new Core();
+        input = new double[close.length];
+        inputInt = new int[close.length];
+        output = new double[close.length];
+        outputInt = new int[close.length];
+        outBegIdx = new MInteger();
+        outNbElement = new MInteger();
+        return ExponentialMovingAverageCall(periodoTiempo);
+    }
+
     /**
      * resets the arrays used in this application since they are only
      * initialized once
@@ -105,12 +117,18 @@ public class TALibDemo  {
         return listaResultante;
     }
 
+    public static ArrayList<RegistroTecnico> ExponentialMovingAverageCall(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Ema);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Ema, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
     public static ArrayList<RegistroTecnico> simpleMovingAverageCall(int periodoTiempo) {
         resetArrayValues();
         lookback = lib.movingAverageLookback(periodoTiempo, MAType.Sma);
         retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Sma, outBegIdx, outNbElement, output);
         return showFinalOutput();
-
     }
 
 

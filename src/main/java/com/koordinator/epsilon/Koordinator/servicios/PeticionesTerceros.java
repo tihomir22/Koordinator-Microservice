@@ -26,9 +26,7 @@ public class PeticionesTerceros {
     public ArrayList<RegistroTecnico> calcularSMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
 
         ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
-
         ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
-
         int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
         ArrayList<RegistroTecnico> res;
         if (resBusquedaIndicador == -1) {
@@ -44,6 +42,27 @@ public class PeticionesTerceros {
         }
         return res;
     }
+
+    public ArrayList<RegistroTecnico> calcularEMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
+
+        ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
+        ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
+        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
+        ArrayList<RegistroTecnico> res;
+        if (resBusquedaIndicador == -1) {
+            List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
+            double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
+            res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
+            IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
+            lista.add(indicadorTecnico);
+            resActivo.setListadoIndicatores(lista);
+            this.repositorioActivos.save(resActivo);
+        }else{
+            res=resActivo.getListadoIndicatores().get(resBusquedaIndicador).getDatosTecnicos();
+        }
+        return res;
+    }
+
 
 
     public PrecioActivo getLivePriceRapidApi(String parBase, String parContra) {
