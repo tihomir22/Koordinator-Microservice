@@ -54,7 +54,7 @@ public class TALibDemo  {
         return listaRes.toBlocking().single();
     }
 
-    public static ArrayList<RegistroTecnico> ejecutarOperacionSMA(double[] list, int periodoTiempo){
+    private static void instanciar(double[] list){
         close=list;
         lib = new Core();
         input = new double[close.length];
@@ -63,19 +63,21 @@ public class TALibDemo  {
         outputInt = new int[close.length];
         outBegIdx = new MInteger();
         outNbElement = new MInteger();
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionSMA(double[] list, int periodoTiempo){
+        instanciar(list);
         return simpleMovingAverageCall(periodoTiempo);
     }
 
     public static ArrayList<RegistroTecnico> ejecutarOperacionEMA(double[] list, int periodoTiempo){
-        close=list;
-        lib = new Core();
-        input = new double[close.length];
-        inputInt = new int[close.length];
-        output = new double[close.length];
-        outputInt = new int[close.length];
-        outBegIdx = new MInteger();
-        outNbElement = new MInteger();
+        instanciar(list);
         return ExponentialMovingAverageCall(periodoTiempo);
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionDEMA(double[] list, int periodoTiempo){
+        instanciar(list);
+        return DoubleExponentialMovingAverageCall(periodoTiempo);
     }
 
     /**
@@ -128,6 +130,13 @@ public class TALibDemo  {
         resetArrayValues();
         lookback = lib.movingAverageLookback(periodoTiempo, MAType.Sma);
         retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Sma, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+    public static ArrayList<RegistroTecnico> DoubleExponentialMovingAverageCall(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Dema);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Dema, outBegIdx, outNbElement, output);
         return showFinalOutput();
     }
 

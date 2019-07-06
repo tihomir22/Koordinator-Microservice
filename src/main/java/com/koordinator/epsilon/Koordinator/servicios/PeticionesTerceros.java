@@ -29,23 +29,17 @@ public class PeticionesTerceros {
         ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
         int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
         ArrayList<RegistroTecnico> res;
+        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
+        double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
+        res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
+        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
         if (resBusquedaIndicador == -1) {
-            List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
-            double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-            res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
-            IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
-            lista.add(indicadorTecnico);
-            resActivo.setListadoIndicatores(lista);
-            this.repositorioActivos.save(resActivo);
+           lista.add(indicadorTecnico);
         }else{
-            List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
-            double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-            res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
-            IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
             lista.set(resBusquedaIndicador,indicadorTecnico);
-            resActivo.setListadoIndicatores(lista);
-            this.repositorioActivos.save(resActivo);
         }
+        resActivo.setListadoIndicatores(lista);
+        this.repositorioActivos.save(resActivo);
         return res;
     }
 
@@ -55,23 +49,36 @@ public class PeticionesTerceros {
         ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
         int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
         ArrayList<RegistroTecnico> res;
+        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
+        double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
+        res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
+        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
         if (resBusquedaIndicador == -1) {
-            List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
-            double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-            res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
-            IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
             lista.add(indicadorTecnico);
-            resActivo.setListadoIndicatores(lista);
-            this.repositorioActivos.save(resActivo);
         }else{
-            List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
-            double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-            res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
-            IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
             lista.set(resBusquedaIndicador,indicadorTecnico);
-            resActivo.setListadoIndicatores(lista);
-            this.repositorioActivos.save(resActivo);
         }
+        resActivo.setListadoIndicatores(lista);
+        this.repositorioActivos.save(resActivo);
+        return res;
+    }
+
+    public ArrayList<RegistroTecnico> calcularDEMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
+        ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
+        ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
+        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
+        ArrayList<RegistroTecnico> res;
+        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
+        double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
+        res = TALibDemo.ejecutarOperacionDEMA(list, periodoTiempo);
+        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
+        if (resBusquedaIndicador == -1) {
+            lista.add(indicadorTecnico);
+        }else{
+            lista.set(resBusquedaIndicador,indicadorTecnico);
+        }
+        resActivo.setListadoIndicatores(lista);
+        this.repositorioActivos.save(resActivo);
         return res;
     }
 

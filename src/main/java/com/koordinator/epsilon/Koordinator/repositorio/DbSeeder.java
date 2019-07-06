@@ -68,6 +68,13 @@ public class DbSeeder implements CommandLineRunner {
                         precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
                         this.repositorioActivos.save(precioActivo);
                     }
+                }else if(indicadorTecnico.getIndicatorName().equalsIgnoreCase("dema")){
+                    int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
+                    if (resIntervalo != -1) {
+                        indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularDEMA(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
+                        precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
+                        this.repositorioActivos.save(precioActivo);
+                    }
                 }
             }
         }
