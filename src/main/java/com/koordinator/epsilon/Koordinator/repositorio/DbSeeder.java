@@ -54,27 +54,11 @@ public class DbSeeder implements CommandLineRunner {
         if (precioActivo.getListadoIndicatores() != null && precioActivo.getListadoIndicatores().size() > 0) {
             for (int i = 0; i < precioActivo.getListadoIndicatores().size(); i++) {
                 IndicadorTecnico indicadorTecnico = precioActivo.getListadoIndicatores().get(i);
-                if (indicadorTecnico.getIndicatorName().equalsIgnoreCase("sma")) {
-                    int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
-                    if (resIntervalo != -1) {
-                        indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularSMA(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
-                        precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
-                        this.repositorioActivos.save(precioActivo);
-                    }
-                }else if(indicadorTecnico.getIndicatorName().equalsIgnoreCase("ema")){
-                    int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
-                    if (resIntervalo != -1) {
-                        indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularEMA(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
-                        precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
-                        this.repositorioActivos.save(precioActivo);
-                    }
-                }else if(indicadorTecnico.getIndicatorName().equalsIgnoreCase("dema")){
-                    int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
-                    if (resIntervalo != -1) {
-                        indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularDEMA(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
-                        precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
-                        this.repositorioActivos.save(precioActivo);
-                    }
+                int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
+                if (resIntervalo != -1) {
+                    indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularMediaMovil(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
+                    precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
+                    this.repositorioActivos.save(precioActivo);
                 }
             }
         }
@@ -101,4 +85,5 @@ public class DbSeeder implements CommandLineRunner {
             this.repositorioActivos.save(precioActivo);
         }
     }
+
 }

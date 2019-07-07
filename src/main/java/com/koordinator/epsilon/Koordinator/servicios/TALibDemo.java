@@ -6,6 +6,7 @@ import com.tictactec.ta.lib.Core;
 import com.tictactec.ta.lib.MAType;
 import com.tictactec.ta.lib.MInteger;
 import com.tictactec.ta.lib.RetCode;
+import org.ta4j.core.indicators.RSIIndicator;
 import rx.Observable;
 import rx.Scheduler;
 
@@ -80,6 +81,36 @@ public class TALibDemo  {
         return DoubleExponentialMovingAverageCall(periodoTiempo);
     }
 
+    public static ArrayList<RegistroTecnico> ejecutarOperacionKAMA(double[] list, int periodoTiempo){
+        instanciar(list);
+        return KaufmanAdaptiveMovingAverageCall(periodoTiempo);
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionMAMA(double[] list, int periodoTiempo){
+        instanciar(list);
+        return MotherOfMovingAverageCall(periodoTiempo);
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionTEMA(double[] list, int periodoTiempo){
+        instanciar(list);
+        return TripleExponencialMovingAverage(periodoTiempo);
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionT3(double[] list, int periodoTiempo){
+        instanciar(list);
+        return TilsonMovingAverageCall(periodoTiempo);
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionTMA(double[] list, int periodoTiempo){
+        instanciar(list);
+        return TriangularMovingAverage(periodoTiempo);
+    }
+
+    public static ArrayList<RegistroTecnico> ejecutarOperacionWMA(double[] list, int periodoTiempo){
+        instanciar(list);
+        return WeightedMovingAverage(periodoTiempo);
+    }
+
     /**
      * resets the arrays used in this application since they are only
      * initialized once
@@ -139,6 +170,50 @@ public class TALibDemo  {
         retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Dema, outBegIdx, outNbElement, output);
         return showFinalOutput();
     }
+
+    public static ArrayList<RegistroTecnico> KaufmanAdaptiveMovingAverageCall(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Kama);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Kama, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+    public static ArrayList<RegistroTecnico> MotherOfMovingAverageCall(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Mama);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Mama, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+    public static ArrayList<RegistroTecnico> TilsonMovingAverageCall(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.T3);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.T3, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+    public static ArrayList<RegistroTecnico> TripleExponencialMovingAverage(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Tema);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Tema, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+    public static ArrayList<RegistroTecnico> TriangularMovingAverage(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Trima);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Trima, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+    public static ArrayList<RegistroTecnico> WeightedMovingAverage(int periodoTiempo) {
+        resetArrayValues();
+        lookback = lib.movingAverageLookback(periodoTiempo, MAType.Wma);
+        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Wma, outBegIdx, outNbElement, output);
+        return showFinalOutput();
+    }
+
+
 
 
 }

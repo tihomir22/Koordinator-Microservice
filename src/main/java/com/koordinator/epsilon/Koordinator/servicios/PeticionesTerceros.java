@@ -1,4 +1,5 @@
 package com.koordinator.epsilon.Koordinator.servicios;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -23,59 +25,56 @@ public class PeticionesTerceros {
     @Autowired
     private RepositorioActivos repositorioActivos;
 
-    public ArrayList<RegistroTecnico> calcularSMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
+
+    public ArrayList<RegistroTecnico> calcularMediaMovil(TipoDatoHistorico historico, PrecioActivo resActivo, String nombreIndicador, int periodoTiempo, String intervaloDatosHistoricos, String tipoSeries) {
 
         ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
         ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
-        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
+        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(), periodoTiempo, intervaloDatosHistoricos, tipoSeries);
         ArrayList<RegistroTecnico> res;
         List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
         double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-        res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
-        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
-        if (resBusquedaIndicador == -1) {
-           lista.add(indicadorTecnico);
-        }else{
-            lista.set(resBusquedaIndicador,indicadorTecnico);
+        switch (nombreIndicador.toUpperCase()) {
+
+            case "SMA":
+                res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
+                break;
+            case "EMA":
+                res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
+                break;
+            case "DEMA":
+                res = TALibDemo.ejecutarOperacionDEMA(list, periodoTiempo);
+                break;
+            case "KAMA":
+                res = TALibDemo.ejecutarOperacionKAMA(list, periodoTiempo);
+                break;
+            case "MAMA":
+                res = TALibDemo.ejecutarOperacionMAMA(list, periodoTiempo);
+                break;
+            case "TEMA":
+                res = TALibDemo.ejecutarOperacionTEMA(list, periodoTiempo);
+                break;
+            case "TMA":
+                res = TALibDemo.ejecutarOperacionTMA(list, periodoTiempo);
+                break;
+            case "WMA":
+                res = TALibDemo.ejecutarOperacionWMA(list, periodoTiempo);
+                break;
+            case "T3":
+                res = TALibDemo.ejecutarOperacionT3(list, periodoTiempo);
+                break;
+
+            default:
+                res = null;
+                System.out.println("No existe ese indicador!");
         }
-        resActivo.setListadoIndicatores(lista);
-        this.repositorioActivos.save(resActivo);
-        return res;
-    }
 
-    public ArrayList<RegistroTecnico> calcularEMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
 
-        ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
-        ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
-        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
-        ArrayList<RegistroTecnico> res;
-        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
-        double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-        res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
-        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
+        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(), intervaloDatosHistoricos, tipoSeries, periodoTiempo, res);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
-        }else{
-            lista.set(resBusquedaIndicador,indicadorTecnico);
-        }
-        resActivo.setListadoIndicatores(lista);
-        this.repositorioActivos.save(resActivo);
-        return res;
-    }
-
-    public ArrayList<RegistroTecnico> calcularDEMA(TipoDatoHistorico historico,PrecioActivo resActivo,String nombreIndicador,int periodoTiempo,String intervaloDatosHistoricos,String tipoSeries){
-        ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
-        ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
-        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(),periodoTiempo,intervaloDatosHistoricos,tipoSeries);
-        ArrayList<RegistroTecnico> res;
-        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
-        double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
-        res = TALibDemo.ejecutarOperacionDEMA(list, periodoTiempo);
-        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(),intervaloDatosHistoricos,tipoSeries,periodoTiempo,res);
-        if (resBusquedaIndicador == -1) {
-            lista.add(indicadorTecnico);
-        }else{
-            lista.set(resBusquedaIndicador,indicadorTecnico);
+        } else {
+            lista.set(resBusquedaIndicador, indicadorTecnico);
         }
         resActivo.setListadoIndicatores(lista);
         this.repositorioActivos.save(resActivo);
@@ -159,30 +158,30 @@ public class PeticionesTerceros {
 
     }
 
-    public TipoDatoHistorico recibirHistoricoActivo(String parBase,String parContra,String intervalo) throws ActivoNoEncontradoException, JSONException {
-        if(!ValidacionesEstaticas.esIntervaloDeBinance(intervalo)){
-            throw new ActivoNoEncontradoException("El intervalo introducido "+intervalo+" no es correcto!");
+    public TipoDatoHistorico recibirHistoricoActivo(String parBase, String parContra, String intervalo) throws ActivoNoEncontradoException, JSONException {
+        if (!ValidacionesEstaticas.esIntervaloDeBinance(intervalo)) {
+            throw new ActivoNoEncontradoException("El intervalo introducido " + intervalo + " no es correcto!");
         }
-        final String uri = "https://api.binance.com/api/v1/klines?symbol="+parBase.toUpperCase()+parContra.toUpperCase()+"&interval="+intervalo;
+        final String uri = "https://api.binance.com/api/v1/klines?symbol=" + parBase.toUpperCase() + parContra.toUpperCase() + "&interval=" + intervalo;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<Object> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, Object.class);
-        ArrayList<TipoDatoHistorico>listaDatosHistoricos=new ArrayList<>();
+        ArrayList<TipoDatoHistorico> listaDatosHistoricos = new ArrayList<>();
         JSONArray jsonarray = new JSONArray(respEntity2.getBody().toString());
-        TipoDatoHistorico tipoDatoHistorico=new TipoDatoHistorico();
-        ArrayList<DatoHistorico>lista=new ArrayList<>();
+        TipoDatoHistorico tipoDatoHistorico = new TipoDatoHistorico();
+        ArrayList<DatoHistorico> lista = new ArrayList<>();
         tipoDatoHistorico.setPeriodo(intervalo);
         for (int i = 0; i < jsonarray.length(); i++) {
-            Object objeto=jsonarray.get(i);
-            String base=objeto.toString().substring(1,objeto.toString().length()-1);
-            String baseOpenTime=base.split(",")[0];
-            String baseOpen=base.split(",")[1];
-            String baseHigh=base.split(",")[2];
-            String baseLow=base.split(",")[3];
-            String baseClose=base.split(",")[4];
-            String baseVolumen=base.split(",")[5];
-            DatoHistorico dato=new DatoHistorico(baseOpenTime,Double.parseDouble(baseOpen),Double.parseDouble(baseHigh),Double.parseDouble(baseLow),Double.parseDouble(baseClose),Double.parseDouble(baseVolumen));
+            Object objeto = jsonarray.get(i);
+            String base = objeto.toString().substring(1, objeto.toString().length() - 1);
+            String baseOpenTime = base.split(",")[0];
+            String baseOpen = base.split(",")[1];
+            String baseHigh = base.split(",")[2];
+            String baseLow = base.split(",")[3];
+            String baseClose = base.split(",")[4];
+            String baseVolumen = base.split(",")[5];
+            DatoHistorico dato = new DatoHistorico(baseOpenTime, Double.parseDouble(baseOpen), Double.parseDouble(baseHigh), Double.parseDouble(baseLow), Double.parseDouble(baseClose), Double.parseDouble(baseVolumen));
             lista.add(dato);
         }
         tipoDatoHistorico.setDato(lista);
