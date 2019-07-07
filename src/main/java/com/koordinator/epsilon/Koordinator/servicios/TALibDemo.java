@@ -111,6 +111,11 @@ public class TALibDemo  {
         return WeightedMovingAverage(periodoTiempo);
     }
 
+    public static ArrayList<RegistroTecnico> ejecutarOperacionRSI(double[] list, int periodoTiempo){
+        instanciar(list);
+        return RSICall(list,periodoTiempo);
+    }
+
     /**
      * resets the arrays used in this application since they are only
      * initialized once
@@ -148,6 +153,23 @@ public class TALibDemo  {
             }
         }
         return listaResultante;
+    }
+
+    public static ArrayList<RegistroTecnico> RSICall(double[] prices, int period) {
+        resetArrayValues();
+        output = new double[prices.length];
+        double[] tempOutPut = new double[prices.length];
+
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        retCode = lib.rsi(0, prices.length - 1, prices, period, begin, length, tempOutPut);
+        for (int i = period; 0 < i && i < (prices.length); i++) {
+            output[i] = tempOutPut[i - period];
+        }
+       return showFinalOutput();
     }
 
     public static ArrayList<RegistroTecnico> ExponentialMovingAverageCall(int periodoTiempo) {

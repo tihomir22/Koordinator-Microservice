@@ -63,6 +63,9 @@ public class PeticionesTerceros {
             case "T3":
                 res = TALibDemo.ejecutarOperacionT3(list, periodoTiempo);
                 break;
+            case "RSI":
+                res = TALibDemo.RSICall(list, periodoTiempo);
+                break;
 
             default:
                 res = null;
@@ -80,7 +83,6 @@ public class PeticionesTerceros {
         this.repositorioActivos.save(resActivo);
         return res;
     }
-
 
 
     public PrecioActivo getLivePriceRapidApi(String parBase, String parContra) {

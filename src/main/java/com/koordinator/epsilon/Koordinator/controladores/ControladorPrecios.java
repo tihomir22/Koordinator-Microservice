@@ -188,6 +188,18 @@ public class ControladorPrecios {
         return null;
     }
 
+    @GetMapping("technical/rsi/**")
+    public ArrayList<RegistroTecnico> recuperarRSI(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
+        if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
+            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            if (resActivo.isPresent()) {
+                Optional<TipoDatoHistorico> historico = this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico));
+                return historico.map(tipoDatoHistorico -> this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "rsi",Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null);
+            }
+        }
+        return null;
+    }
+
 
 
 
