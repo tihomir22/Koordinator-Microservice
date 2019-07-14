@@ -31,6 +31,7 @@ public class ControladorPrecios {
         List<PrecioActivo> lista = this.repositorioActivos.findAll();
         return lista;
     }
+    
 
     @GetMapping("/prices/{parbase}/{parcontra}")
     public Optional<RespuestaPersonalizada> recuperarPrecioActivo(@PathVariable("parbase") String id, @PathVariable("parcontra") String id2) throws ActivoNoEncontradoException {
