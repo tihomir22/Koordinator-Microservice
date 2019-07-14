@@ -3,6 +3,7 @@ package com.koordinator.epsilon.Koordinator.servicios;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
+import com.koordinator.epsilon.Koordinator.Excepciones.ExceptionResponse;
 import com.koordinator.epsilon.Koordinator.StaticTools;
 import com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas;
 import com.koordinator.epsilon.Koordinator.entidades.*;
@@ -128,13 +129,19 @@ public class PeticionesTerceros {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<String> entity = new HttpEntity<>("body", headers);
-            ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
-            JsonNode highDepth = respEntity2.getBody().get("price");
-            if (!highDepth.isNull()) {
-                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
-            } else {
+            try {
+                ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
+                JsonNode highDepth = respEntity2.getBody().get("price");
+                if (!highDepth.isNull()) {
+                    return new PrecioActivo(parBase + parContra, highDepth.asDouble(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
+                } else {
+                    return null;
+                }
+            }catch (Exception ex){
+                System.out.println("Se ha intentado obtener un activo que no existe en BINANCE");
                 return null;
             }
+
         } catch (NullPointerException ex) {
             throw new ActivoNoEncontradoException("El activo " + parBase.toUpperCase() + "/" + parContra.toUpperCase() + " no existe");
         }

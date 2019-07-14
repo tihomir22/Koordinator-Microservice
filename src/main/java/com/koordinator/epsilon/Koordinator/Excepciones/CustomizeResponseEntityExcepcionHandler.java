@@ -17,9 +17,10 @@ import java.util.Date;
 @RestController
 public class CustomizeResponseEntityExcepcionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ActivoNoEncontradoException.class)
+
+   /* @ExceptionHandler(ActivoNoEncontradoException.class)
     public final ResponseEntity<Object> handleActivoNoEncontradoException(Exception ex, WebRequest request){
-        ExceptionResponse exceptionResponse= new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        ExceptionResponse exceptionResponse= new ExceptionResponse(new Date(),"Dembow loco",request.getDescription(false));
         return new ResponseEntity(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
@@ -36,5 +37,29 @@ public class CustomizeResponseEntityExcepcionHandler extends ResponseEntityExcep
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ExceptionResponse exceptionResponse= new ExceptionResponse(new Date(),"La validacion ha fallado",ex.getBindingResult().toString());
        return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }*/
+
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<Object> handleAnyException(Exception ex, WebRequest request) {
+        String errorMessageDesc = ex.getLocalizedMessage();
+        if (errorMessageDesc == null) errorMessageDesc = ex.getMessage();
+        ErrorMessage errorMessage = new ErrorMessage(new Date(), errorMessageDesc);
+        return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = {NullPointerException.class})
+    public ResponseEntity<Object> handleNullPointerException(NullPointerException ex, WebRequest request) {
+        String errorMessageDesc = ex.getLocalizedMessage();
+        if (errorMessageDesc == null) errorMessageDesc = ex.getMessage();
+        ErrorMessage errorMessage = new ErrorMessage(new Date(), errorMessageDesc);
+        return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = {ActivoNoEncontradoException.class})
+    public ResponseEntity<Object> handleActivoNoEncontradoException(ActivoNoEncontradoException ex, WebRequest request) {
+        String errorMessageDesc = ex.getLocalizedMessage();
+        if (errorMessageDesc == null) errorMessageDesc = ex.getMessage();
+        ErrorMessage errorMessage = new ErrorMessage(new Date(), errorMessageDesc);
+        return new ResponseEntity<>(errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

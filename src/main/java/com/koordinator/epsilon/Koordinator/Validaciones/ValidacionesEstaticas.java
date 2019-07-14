@@ -9,10 +9,10 @@ import java.util.Map;
 public class ValidacionesEstaticas {
 
     public static String nombreParBase = "base";
-    public static String nombreParContra = "contra";
-    public static String intervaloHistorico = "intervaloHistorico";
-    public static String intervaloPeriodoIndicador = "intervalo";
-    public static String tipoSeriesIndicador = "tipoSeries";
+    public static String nombreParContra = "counter";
+    public static String intervaloHistorico = "historicInterval";
+    public static String intervaloPeriodoIndicador = "indicatorInterval";
+    public static String tipoSeriesIndicador = "seriesType";
 
 
     public static boolean validacionSMA(Map<String, String> parametrosRecibidos) {
