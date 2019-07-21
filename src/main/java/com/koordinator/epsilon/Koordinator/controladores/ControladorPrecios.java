@@ -27,19 +27,19 @@ public class ControladorPrecios {
 
 
     @GetMapping("/")
-    public List<PrecioActivo> getAll() {
-        List<PrecioActivo> lista = this.repositorioActivos.findAll();
+    public List<AssetPrice> getAll() {
+        List<AssetPrice> lista = this.repositorioActivos.findAll();
         return lista;
     }
-    
+
 
     @GetMapping("/prices/{parbase}/{parcontra}")
     public Optional<RespuestaPersonalizada> recuperarPrecioActivo(@PathVariable("parbase") String id, @PathVariable("parcontra") String id2) throws ActivoNoEncontradoException {
-        Optional<PrecioActivo> res = this.repositorioActivos.findById(id + id2);
+        Optional<AssetPrice> res = this.repositorioActivos.findById(id + id2);
         if (res.isPresent()) {
             return Optional.of(new RespuestaPersonalizada(200, "Price result " + id + id2, res.get()));
         } else {
-            Optional<PrecioActivo> resOpt = Optional.ofNullable(this.peticionesTerceros.getBinanceTicker(id.toUpperCase(), id2.toUpperCase()));
+            Optional<AssetPrice> resOpt = Optional.ofNullable(this.peticionesTerceros.getBinanceTicker(id.toUpperCase(), id2.toUpperCase()));
             if (resOpt.isPresent()) {
                 this.repositorioActivos.save(resOpt.get());
                 return Optional.of(new RespuestaPersonalizada(200, "Price result " + id + id2, resOpt.get()));
@@ -53,18 +53,18 @@ public class ControladorPrecios {
     public Optional<RespuestaPersonalizadaHistorico> recuperarHistoricoActivo(@PathVariable("parbase") String id, @PathVariable("parcontra") String id2, @PathVariable("interval") String intervalo) throws IOException, JSONException {
         id = id.toUpperCase();
         id2 = id2.toUpperCase();
-        Optional<PrecioActivo> res = this.repositorioActivos.findById(id + id2);
+        Optional<AssetPrice> res = this.repositorioActivos.findById(id + id2);
         if (!res.isPresent()) {
             res = Optional.ofNullable(this.recuperarPrecioActivo(id, id2).get().getData());
         }
         if (res.isPresent()) {
 
-            ArrayList<TipoDatoHistorico> lista = res.get().getListaDatosHora();
+            ArrayList<HistoricDataWrapper> lista = res.get().getHistoricData();
             if (lista == null) {
-                lista = new ArrayList<TipoDatoHistorico>();
+                lista = new ArrayList<HistoricDataWrapper>();
             }
             int resBusqueda = StaticTools.buscarIntervalo(lista, intervalo);
-            Optional<TipoDatoHistorico> resOpt;
+            Optional<HistoricDataWrapper> resOpt;
             if (resBusqueda == -1) {
                 resOpt = Optional.ofNullable(this.peticionesTerceros.recibirHistoricoActivo(id, id2, intervalo));
                 if (resOpt.isPresent()) {
@@ -72,7 +72,7 @@ public class ControladorPrecios {
                 } else {
                     return Optional.of(new RespuestaPersonalizadaHistorico(404, "The interval " + intervalo + " does not exist!", null));
                 }
-                res.get().setListaDatosHora(lista);
+                res.get().setHistoricData(lista);
             } else {
                 resOpt = Optional.ofNullable(lista.get(resBusqueda));
             }
@@ -89,10 +89,10 @@ public class ControladorPrecios {
     @GetMapping("technical/sma/**")
     public Optional<RespuestaIndicadorTecnico> recuperarSMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result SMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result SMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "sma", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -103,10 +103,10 @@ public class ControladorPrecios {
     @GetMapping("technical/ema/**")
     public Optional<RespuestaIndicadorTecnico> recuperarEMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result EMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result EMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "ema", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -118,10 +118,10 @@ public class ControladorPrecios {
     @GetMapping("technical/dema/**")
     public Optional<RespuestaIndicadorTecnico> recuperarDEMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result DEMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result DEMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "dema", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -136,10 +136,10 @@ public class ControladorPrecios {
     @GetMapping("technical/kama/**")
     public Optional<RespuestaIndicadorTecnico> recuperarKAMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result KAMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result KAMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "kama", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -151,10 +151,10 @@ public class ControladorPrecios {
     @GetMapping("technical/mama/**")
     public Optional<RespuestaIndicadorTecnico> recuperarMAMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result MAMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result MAMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "mama", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -165,10 +165,10 @@ public class ControladorPrecios {
     @GetMapping("technical/tema/**")
     public Optional<RespuestaIndicadorTecnico> recuperarTEMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result TEMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result TEMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "tema", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -179,10 +179,10 @@ public class ControladorPrecios {
     @GetMapping("technical/tma/**")
     public Optional<RespuestaIndicadorTecnico> recuperarTMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result TMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result TMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "tma", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -193,10 +193,10 @@ public class ControladorPrecios {
     @GetMapping("technical/wma/**")
     public Optional<RespuestaIndicadorTecnico> recuperarWMA(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result WMA " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result WMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "wma", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -207,10 +207,10 @@ public class ControladorPrecios {
     @GetMapping("technical/t3/**")
     public Optional<RespuestaIndicadorTecnico> recuperarT3(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result T3 " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result T3 " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "t3", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -221,10 +221,10 @@ public class ControladorPrecios {
     @GetMapping("technical/rsi/**")
     public Optional<RespuestaIndicadorTecnico> recuperarRSI(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
         if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
-            Optional<TipoDatoHistorico> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
-            Optional<PrecioActivo> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
             return Optional.of(
-                    new RespuestaIndicadorTecnico(200, "Technical result RSI " + historico.get().getPeriodo(),
+                    new RespuestaIndicadorTecnico(200, "Technical result RSI " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
                                     this.peticionesTerceros.calcularMediaMovil(tipoDatoHistorico, resActivo.get(), "rsi", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
 
@@ -234,13 +234,4 @@ public class ControladorPrecios {
 
 
 
-    @PostMapping
-    public void insert(@RequestBody PrecioActivo activo) {
-        this.repositorioActivos.save(activo);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") String id) {
-        this.repositorioActivos.deleteById(id);
-    }
 }

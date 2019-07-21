@@ -1,7 +1,5 @@
 package com.koordinator.epsilon.Koordinator.entidades;
 
-import java.util.Date;
-
 public class RapidApiPrecio {
     private boolean success;
     private String source;

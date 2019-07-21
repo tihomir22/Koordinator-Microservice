@@ -27,12 +27,12 @@ public class PeticionesTerceros {
     private RepositorioActivos repositorioActivos;
 
 
-    public ArrayList<RegistroTecnico> calcularMediaMovil(TipoDatoHistorico historico, PrecioActivo resActivo, String nombreIndicador, int periodoTiempo, String intervaloDatosHistoricos, String tipoSeries) {
+    public ArrayList<TechnicalRegistry> calcularMediaMovil(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, int periodoTiempo, String intervaloDatosHistoricos, String tipoSeries) {
 
-        ArrayList<DatoHistorico> listaDatosHistoricos = historico.getDato();
-        ArrayList<IndicadorTecnico> lista = resActivo.getListadoIndicatores();
+        ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
+        ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
         int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(), periodoTiempo, intervaloDatosHistoricos, tipoSeries);
-        ArrayList<RegistroTecnico> res;
+        ArrayList<TechnicalRegistry> res;
         List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
         double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
         switch (nombreIndicador.toUpperCase()) {
@@ -74,19 +74,19 @@ public class PeticionesTerceros {
         }
 
 
-        IndicadorTecnico indicadorTecnico = new IndicadorTecnico(nombreIndicador.toUpperCase(), intervaloDatosHistoricos, tipoSeries, periodoTiempo, res);
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), intervaloDatosHistoricos, tipoSeries, periodoTiempo, res);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
         } else {
             lista.set(resBusquedaIndicador, indicadorTecnico);
         }
-        resActivo.setListadoIndicatores(lista);
+        resActivo.setIndicatorList(lista);
         this.repositorioActivos.save(resActivo);
         return res;
     }
 
 
-    public PrecioActivo getLivePriceRapidApi(String parBase, String parContra) {
+    public AssetPrice getLivePriceRapidApi(String parBase, String parContra) {
         final String uri = "https://bravenewcoin-v1.p.rapidapi.com/convert?qty=1&from=" + parBase.toLowerCase() + "&to=" + parContra.toLowerCase();
 
         RestTemplate restTemplate = new RestTemplate();
@@ -97,7 +97,7 @@ public class PeticionesTerceros {
 
         ResponseEntity<RapidApiPrecio> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, RapidApiPrecio.class);
         if (respEntity2.getBody().isSuccess()) {
-            PrecioActivo returnValue = new PrecioActivo(parBase + parContra, respEntity2.getBody().getTo_quantity(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
+            AssetPrice returnValue = new AssetPrice(parBase + parContra, respEntity2.getBody().getTo_quantity(), new ArrayList<HistoricDataWrapper>(), parBase, parContra);
             return returnValue;
         } else {
             return null;
@@ -105,7 +105,7 @@ public class PeticionesTerceros {
 
     }
 
-    public PrecioActivo getCryptoCompareApi(String parBase, String parContra) {
+    public AssetPrice getCryptoCompareApi(String parBase, String parContra) {
         try {
             final String uri = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + parBase.toUpperCase() + "&tsyms=" + parContra.toUpperCase() + "&api_key=6df543455629ca3d59e3d3a38cc6b7db7a922fdfbf6005e9b8c0a126731374cc";
             RestTemplate restTemplate = new RestTemplate();
@@ -114,7 +114,7 @@ public class PeticionesTerceros {
             ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
             JsonNode highDepth = respEntity2.getBody().get(parBase).get(parContra);
             if (!highDepth.isNull()) {
-                return new PrecioActivo(parBase + parContra, highDepth.asDouble(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
+                return new AssetPrice(parBase + parContra, highDepth.asDouble(), new ArrayList<HistoricDataWrapper>(), parBase, parContra);
             } else {
                 return null;
             }
@@ -123,7 +123,7 @@ public class PeticionesTerceros {
         }
     }
 
-    public PrecioActivo getBinanceTicker(String parBase, String parContra) {
+    public AssetPrice getBinanceTicker(String parBase, String parContra) {
         try {
             final String uri = "https://api.binance.com/api/v3/ticker/price?symbol=" + parBase.toUpperCase() + parContra.toUpperCase();
             RestTemplate restTemplate = new RestTemplate();
@@ -133,7 +133,7 @@ public class PeticionesTerceros {
                 ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
                 JsonNode highDepth = respEntity2.getBody().get("price");
                 if (!highDepth.isNull()) {
-                    return new PrecioActivo(parBase + parContra, highDepth.asDouble(), new ArrayList<TipoDatoHistorico>(), parBase, parContra);
+                    return new AssetPrice(parBase + parContra, highDepth.asDouble(), new ArrayList<HistoricDataWrapper>(), parBase, parContra);
                 } else {
                     return null;
                 }
@@ -147,27 +147,27 @@ public class PeticionesTerceros {
         }
     }
 
-    public PrecioActivo updateBinanceTicker(PrecioActivo precioActivo) {
+    public AssetPrice updateBinanceTicker(AssetPrice precioActivo) {
         try {
-            final String uri = "https://api.binance.com/api/v3/ticker/price?symbol=" + precioActivo.getParBase().toUpperCase() + precioActivo.getParContra().toUpperCase();
+            final String uri = "https://api.binance.com/api/v3/ticker/price?symbol=" + precioActivo.getBasePair().toUpperCase() + precioActivo.getCounterPair().toUpperCase();
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<String> entity = new HttpEntity<>("body", headers);
             ResponseEntity<ObjectNode> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, ObjectNode.class);
             JsonNode highDepth = respEntity2.getBody().get("price");
             if (!highDepth.isNull()) {
-                precioActivo.setPrecio(highDepth.asDouble());
+                precioActivo.setPrice(highDepth.asDouble());
                 return precioActivo;
             } else {
                 return null;
             }
         } catch (NullPointerException ex) {
-            throw new ActivoNoEncontradoException("El activo " + precioActivo.getParBase().toUpperCase() + "/" + precioActivo.getParContra().toUpperCase() + " no existe");
+            throw new ActivoNoEncontradoException("El activo " + precioActivo.getBasePair().toUpperCase() + "/" + precioActivo.getCounterPair().toUpperCase() + " no existe");
         }
 
     }
 
-    public TipoDatoHistorico recibirHistoricoActivo(String parBase, String parContra, String intervalo) throws ActivoNoEncontradoException, JSONException {
+    public HistoricDataWrapper recibirHistoricoActivo(String parBase, String parContra, String intervalo) throws ActivoNoEncontradoException, JSONException {
         if (!ValidacionesEstaticas.esIntervaloDeBinance(intervalo)) {
             throw new ActivoNoEncontradoException("El intervalo introducido " + intervalo + " no es correcto!");
         }
@@ -176,11 +176,11 @@ public class PeticionesTerceros {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<Object> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, Object.class);
-        ArrayList<TipoDatoHistorico> listaDatosHistoricos = new ArrayList<>();
+        ArrayList<HistoricDataWrapper> listaDatosHistoricos = new ArrayList<>();
         JSONArray jsonarray = new JSONArray(respEntity2.getBody().toString());
-        TipoDatoHistorico tipoDatoHistorico = new TipoDatoHistorico();
-        ArrayList<DatoHistorico> lista = new ArrayList<>();
-        tipoDatoHistorico.setPeriodo(intervalo);
+        HistoricDataWrapper tipoDatoHistorico = new HistoricDataWrapper();
+        ArrayList<HistoricData> lista = new ArrayList<>();
+        tipoDatoHistorico.setPeriod(intervalo);
         for (int i = 0; i < jsonarray.length(); i++) {
             Object objeto = jsonarray.get(i);
             String base = objeto.toString().substring(1, objeto.toString().length() - 1);
@@ -190,11 +190,11 @@ public class PeticionesTerceros {
             String baseLow = base.split(",")[3];
             String baseClose = base.split(",")[4];
             String baseVolumen = base.split(",")[5];
-            DatoHistorico dato = new DatoHistorico(baseOpenTime, Double.parseDouble(baseOpen), Double.parseDouble(baseHigh), Double.parseDouble(baseLow), Double.parseDouble(baseClose), Double.parseDouble(baseVolumen));
+            HistoricData dato = new HistoricData(baseOpenTime, Double.parseDouble(baseOpen), Double.parseDouble(baseHigh), Double.parseDouble(baseLow), Double.parseDouble(baseClose), Double.parseDouble(baseVolumen));
             lista.add(dato);
         }
-        tipoDatoHistorico.setDato(lista);
-        tipoDatoHistorico.setNumRegistros(lista.size());
+        tipoDatoHistorico.setRawHistoricData(lista);
+        tipoDatoHistorico.setNumRecords(lista.size());
         return tipoDatoHistorico;
     }
 

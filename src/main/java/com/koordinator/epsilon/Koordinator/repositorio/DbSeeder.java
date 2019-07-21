@@ -1,9 +1,9 @@
 package com.koordinator.epsilon.Koordinator.repositorio;
 
 import com.koordinator.epsilon.Koordinator.StaticTools;
-import com.koordinator.epsilon.Koordinator.entidades.IndicadorTecnico;
-import com.koordinator.epsilon.Koordinator.entidades.PrecioActivo;
-import com.koordinator.epsilon.Koordinator.entidades.TipoDatoHistorico;
+import com.koordinator.epsilon.Koordinator.entidades.AssetPrice;
+import com.koordinator.epsilon.Koordinator.entidades.HistoricDataWrapper;
+import com.koordinator.epsilon.Koordinator.entidades.TechnicalIndicatorWrapper;
 import com.koordinator.epsilon.Koordinator.servicios.PeticionesTerceros;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +38,7 @@ public class DbSeeder implements CommandLineRunner {
 
         while (true) {
             Thread.sleep(10000);
-            List<PrecioActivo> arrayActivosMongo = this.repositorioActivos.findAll();
+            List<AssetPrice> arrayActivosMongo = this.repositorioActivos.findAll();
             for (int i = 0; i < arrayActivosMongo.size(); i++) {
                 this.recuperarPrecioAsincrono(arrayActivosMongo.get(i));
                 this.recuperarHistoricoAsincrono(arrayActivosMongo.get(i));
@@ -50,14 +49,14 @@ public class DbSeeder implements CommandLineRunner {
     }
 
     @Async
-    private void actualizarIndicadores(PrecioActivo precioActivo) {
-        if (precioActivo.getListadoIndicatores() != null && precioActivo.getListadoIndicatores().size() > 0) {
-            for (int i = 0; i < precioActivo.getListadoIndicatores().size(); i++) {
-                IndicadorTecnico indicadorTecnico = precioActivo.getListadoIndicatores().get(i);
-                int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getListaDatosHora(), indicadorTecnico.getPeriodoDatosHistoricos());
+    private void actualizarIndicadores(AssetPrice precioActivo) {
+        if (precioActivo.getIndicatorList() != null && precioActivo.getIndicatorList().size() > 0) {
+            for (int i = 0; i < precioActivo.getIndicatorList().size(); i++) {
+                TechnicalIndicatorWrapper indicadorTecnico = precioActivo.getIndicatorList().get(i);
+                int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getHistoricData(), indicadorTecnico.getHistoricPeriod());
                 if (resIntervalo != -1) {
-                    indicadorTecnico.setDatosTecnicos(this.peticionesTerceros.calcularMediaMovil(precioActivo.getListaDatosHora().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getIntervalo(), indicadorTecnico.getPeriodoDatosHistoricos(), indicadorTecnico.getTipoSeries()));
-                    precioActivo.getListadoIndicatores().set(i, indicadorTecnico);
+                    indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.calcularMediaMovil(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getInterval(), indicadorTecnico.getHistoricPeriod(), indicadorTecnico.getSeriesType()));
+                    precioActivo.getIndicatorList().set(i, indicadorTecnico);
                     this.repositorioActivos.save(precioActivo);
                 }
             }
@@ -65,21 +64,21 @@ public class DbSeeder implements CommandLineRunner {
     }
 
     @Async
-    private void recuperarPrecioAsincrono(PrecioActivo precioActivo) throws ExecutionException, InterruptedException {
+    private void recuperarPrecioAsincrono(AssetPrice precioActivo) throws ExecutionException, InterruptedException {
         CompletableFuture completableFuture = CompletableFuture.completedFuture(this.peticionesTerceros.updateBinanceTicker(precioActivo));
         completableFuture.join();
-        PrecioActivo precioActivoRes = (PrecioActivo) completableFuture.get();
+        AssetPrice precioActivoRes = (AssetPrice) completableFuture.get();
         this.repositorioActivos.save(precioActivoRes);
     }
 
     @Async
-    private void recuperarHistoricoAsincrono(PrecioActivo precioActivo) throws JSONException, ExecutionException, InterruptedException {
-        if (precioActivo.getListaDatosHora() != null && precioActivo.getListaDatosHora().size() > 0) {
-            for (int i = 0; i < precioActivo.getListaDatosHora().size(); i++) {
-                TipoDatoHistorico tipo = precioActivo.getListaDatosHora().get(i);
-                CompletableFuture completableFuture = CompletableFuture.completedFuture(this.peticionesTerceros.recibirHistoricoActivo(precioActivo.getParBase(), precioActivo.getParContra(), tipo.getPeriodo()));
+    private void recuperarHistoricoAsincrono(AssetPrice precioActivo) throws JSONException, ExecutionException, InterruptedException {
+        if (precioActivo.getHistoricData() != null && precioActivo.getHistoricData().size() > 0) {
+            for (int i = 0; i < precioActivo.getHistoricData().size(); i++) {
+                HistoricDataWrapper tipo = precioActivo.getHistoricData().get(i);
+                CompletableFuture completableFuture = CompletableFuture.completedFuture(this.peticionesTerceros.recibirHistoricoActivo(precioActivo.getBasePair(), precioActivo.getCounterPair(), tipo.getPeriod()));
                 completableFuture.join();
-                TipoDatoHistorico tipoRes = (TipoDatoHistorico) completableFuture.get();
+                HistoricDataWrapper tipoRes = (HistoricDataWrapper) completableFuture.get();
                 precioActivo.modificarItemTipoHistoricoLista(i, tipoRes);
             }
             this.repositorioActivos.save(precioActivo);

@@ -1,17 +1,17 @@
 package com.koordinator.epsilon.Koordinator.Respuestas;
 
-import com.koordinator.epsilon.Koordinator.entidades.PrecioActivo;
+import com.koordinator.epsilon.Koordinator.entidades.AssetPrice;
 
 public class RespuestaPersonalizada extends RespuestaBase {
 
-    private PrecioActivo data;
+    private AssetPrice data;
 
-    public RespuestaPersonalizada(int estado, String mensaje, PrecioActivo data) {
+    public RespuestaPersonalizada(int estado, String mensaje, AssetPrice data) {
         super(estado, mensaje);
         this.data = data;
     }
 
-    public RespuestaPersonalizada(PrecioActivo data) {
+    public RespuestaPersonalizada(AssetPrice data) {
         this.data = data;
     }
 
@@ -22,11 +22,11 @@ public class RespuestaPersonalizada extends RespuestaBase {
     public RespuestaPersonalizada() {
     }
 
-    public PrecioActivo getData() {
+    public AssetPrice getData() {
         return data;
     }
 
-    public void setData(PrecioActivo data) {
+    public void setData(AssetPrice data) {
         this.data = data;
     }
 

@@ -1,17 +1,17 @@
 package com.koordinator.epsilon.Koordinator.Respuestas;
 
-import com.koordinator.epsilon.Koordinator.entidades.TipoDatoHistorico;
+import com.koordinator.epsilon.Koordinator.entidades.HistoricDataWrapper;
 
 public class RespuestaPersonalizadaHistorico extends RespuestaBase{
 
-    private TipoDatoHistorico data;
+    private HistoricDataWrapper data;
 
-    public RespuestaPersonalizadaHistorico(int estado, String mensaje, TipoDatoHistorico data) {
+    public RespuestaPersonalizadaHistorico(int estado, String mensaje, HistoricDataWrapper data) {
         super(estado, mensaje);
         this.data = data;
     }
 
-    public RespuestaPersonalizadaHistorico(TipoDatoHistorico data) {
+    public RespuestaPersonalizadaHistorico(HistoricDataWrapper data) {
         this.data = data;
     }
 
@@ -22,11 +22,11 @@ public class RespuestaPersonalizadaHistorico extends RespuestaBase{
         super(estado, mensaje);
     }
 
-    public TipoDatoHistorico getData() {
+    public HistoricDataWrapper getData() {
         return data;
     }
 
-    public void setData(TipoDatoHistorico data) {
+    public void setData(HistoricDataWrapper data) {
         this.data = data;
     }
 

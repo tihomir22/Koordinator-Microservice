@@ -1,18 +1,18 @@
 package com.koordinator.epsilon.Koordinator.Respuestas;
 
-import com.koordinator.epsilon.Koordinator.entidades.RegistroTecnico;
+import com.koordinator.epsilon.Koordinator.entidades.TechnicalRegistry;
 
 import java.util.ArrayList;
 
 public class RespuestaIndicadorTecnico extends RespuestaBase{
-    private ArrayList<RegistroTecnico> listaTecnico;
+    private ArrayList<TechnicalRegistry >listaTecnico;
 
-    public RespuestaIndicadorTecnico(int estado, String mensaje, ArrayList<RegistroTecnico> listaTecnico) {
+    public RespuestaIndicadorTecnico(int estado, String mensaje, ArrayList<TechnicalRegistry > listaTecnico) {
         super(estado, mensaje);
         this.listaTecnico = listaTecnico;
     }
 
-    public RespuestaIndicadorTecnico(ArrayList<RegistroTecnico> listaTecnico) {
+    public RespuestaIndicadorTecnico(ArrayList<TechnicalRegistry > listaTecnico) {
         this.listaTecnico = listaTecnico;
     }
 
@@ -23,11 +23,13 @@ public class RespuestaIndicadorTecnico extends RespuestaBase{
     public RespuestaIndicadorTecnico() {
     }
 
-    public ArrayList<RegistroTecnico> getListaTecnico() {
+
+
+    public ArrayList<TechnicalRegistry > getListaTecnico() {
         return listaTecnico;
     }
 
-    public void setListaTecnico(ArrayList<RegistroTecnico> listaTecnico) {
+    public void setListaTecnico(ArrayList<TechnicalRegistry > listaTecnico) {
         this.listaTecnico = listaTecnico;
     }
 

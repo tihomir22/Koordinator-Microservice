@@ -1,27 +1,27 @@
 package com.koordinator.epsilon.Koordinator;
 
-import com.koordinator.epsilon.Koordinator.entidades.IndicadorTecnico;
-import com.koordinator.epsilon.Koordinator.entidades.TipoDatoHistorico;
+import com.koordinator.epsilon.Koordinator.entidades.HistoricDataWrapper;
+import com.koordinator.epsilon.Koordinator.entidades.TechnicalIndicatorWrapper;
 
 import java.util.ArrayList;
 
 public class StaticTools {
-    public static int buscarIntervalo(ArrayList<TipoDatoHistorico> lista, String intervalo) {
+    public static int buscarIntervalo(ArrayList<HistoricDataWrapper> lista, String intervalo) {
         for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getPeriodo().equals(intervalo)) {
+            if (lista.get(i).getPeriod().equals(intervalo)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public static int buscarIndicador(ArrayList<IndicadorTecnico> indicadorTecnicos, String indicadorBuscado, int intervalo, String periodoDatosHistoricos, String tipoSeries) {
+    public static int buscarIndicador(ArrayList<TechnicalIndicatorWrapper> indicadorTecnicos, String indicadorBuscado, int intervalo, String periodoDatosHistoricos, String tipoSeries) {
         for (int i = 0; i < indicadorTecnicos.size(); i++) {
-            IndicadorTecnico indicadorTecnico = indicadorTecnicos.get(i);
+            TechnicalIndicatorWrapper indicadorTecnico = indicadorTecnicos.get(i);
             if (indicadorTecnico.getIndicatorName().equalsIgnoreCase(indicadorBuscado) &&
-                    indicadorTecnico.getIntervalo() == intervalo &&
-                    indicadorTecnico.getPeriodoDatosHistoricos().equalsIgnoreCase(periodoDatosHistoricos) &&
-                    indicadorTecnico.getTipoSeries().equalsIgnoreCase(tipoSeries)) {
+                    indicadorTecnico.getInterval() == intervalo &&
+                    indicadorTecnico.getHistoricPeriod().equalsIgnoreCase(periodoDatosHistoricos) &&
+                    indicadorTecnico.getSeriesType().equalsIgnoreCase(tipoSeries)) {
                 return i;
             }
         }
