@@ -9,6 +9,8 @@ import java.util.Date;
 public class TechnicalRegistry {
     @ApiModelProperty(notes="Number of the record , similar to id",example = "1")
     private int numRegistry;
+    @ApiModelProperty(notes="Extra information about the registry", example = "Stoch Registry")
+    private String extra;
     @ApiModelProperty(notes="Historic price attached to the technical indicator registry below",example = "10343.34")
     private double historicPrice;
     @ApiModelProperty(notes="Technical indicator registry",example = "10255.14")
@@ -16,24 +18,24 @@ public class TechnicalRegistry {
     @ApiModelProperty(notes="Date of the technical registry ", example = "1563700393")
     private Date date;
 
-    @Override
-    public String toString() {
-        return "TechnicalRegistry{" +
-                "numRegistry=" + numRegistry +
-                ", historicPrice=" + historicPrice +
-                ", technicalIndicator=" + technicalIndicator +
-                ", date=" + date +
-                '}';
-    }
 
-    public TechnicalRegistry(int numRegistry, double historicPrice, double technicalIndicator, Date date) {
+    public TechnicalRegistry(int numRegistry, String extra, double historicPrice, double technicalIndicator, Date date) {
         this.numRegistry = numRegistry;
+        this.extra = extra;
         this.historicPrice = historicPrice;
         this.technicalIndicator = technicalIndicator;
         this.date = date;
     }
 
-    public TechnicalRegistry() {
+    @Override
+    public String toString() {
+        return "TechnicalRegistry{" +
+                "numRegistry=" + numRegistry +
+                ", extra='" + extra + '\'' +
+                ", historicPrice=" + historicPrice +
+                ", technicalIndicator=" + technicalIndicator +
+                ", date=" + date +
+                '}';
     }
 
     public int getNumRegistry() {
@@ -42,6 +44,14 @@ public class TechnicalRegistry {
 
     public void setNumRegistry(int numRegistry) {
         this.numRegistry = numRegistry;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 
     public double getHistoricPrice() {

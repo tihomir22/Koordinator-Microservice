@@ -17,9 +17,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import rx.Observable;
 
 import java.io.IOException;
 import java.util.*;
+
+import static com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas.intervaloHistorico;
+import static com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas.tipoSeriesIndicador;
 
 @Service
 public class PeticionesTerceros {
@@ -27,14 +31,77 @@ public class PeticionesTerceros {
     private RepositorioActivos repositorioActivos;
 
 
-    public ArrayList<TechnicalRegistry> calcularMediaMovil(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, int periodoTiempo, String intervaloDatosHistoricos, String tipoSeries) {
+    public TechnicalRegistry[][] HDataNombreIntervaloHData(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador,Map<String,String> queryParams){
+        ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
+        ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
+        int resBusquedaIndicador=StaticTools.buscarIndicadorSimple(lista,nombreIndicador.toUpperCase(),queryParams.get(intervaloHistorico));
+        TechnicalRegistry[][] res;
+        TALibDemo.inicializar(listaDatosHistoricos);
+
+        switch (nombreIndicador.toUpperCase()){
+            case "STOCH":
+                rx.Observable<HistoricData> source = Observable.from(listaDatosHistoricos);
+                List<Double> listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                List<Double> listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
+                List<Double> listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
+                res = TALibDemo.ejecutarOperacionSTOCH( listaCierre,listaMaximo,listaMinimo,queryParams);
+                break;
+                default:
+                    res = null;
+                    System.out.println("No existe ese indicador!");
+        }
+
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, -1, res);
+        if (resBusquedaIndicador == -1) {
+            lista.add(indicadorTecnico);
+        } else {
+            lista.set(resBusquedaIndicador, indicadorTecnico);
+        }
+        resActivo.setIndicatorList(lista);
+        this.repositorioActivos.save(resActivo);
+        return res;
+    }
+
+    public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeries(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador,Map<String,String> queryParams){
+        ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
+        ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
+        int resBusquedaIndicador=StaticTools.buscarIndicadorSimpleConSeries(lista,nombreIndicador.toUpperCase(),queryParams.get(intervaloHistorico),queryParams.get(tipoSeriesIndicador));
+        TechnicalRegistry[][] res;
+        TALibDemo.inicializar(listaDatosHistoricos);
+
+        switch (nombreIndicador.toUpperCase()){
+            case "MACD":
+                rx.Observable<HistoricData> source = Observable.from(listaDatosHistoricos);
+                List<Double> listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                res=TALibDemo.ejecutarOperacionMACD(listaCierre,queryParams);
+                break;
+            default:
+                res = null;
+                System.out.println("No existe ese indicador!");
+        }
+
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, -1, res);
+        if (resBusquedaIndicador == -1) {
+            lista.add(indicadorTecnico);
+        } else {
+            lista.set(resBusquedaIndicador, indicadorTecnico);
+        }
+        resActivo.setIndicatorList(lista);
+        this.repositorioActivos.save(resActivo);
+        return res;
+    }
+
+    public TechnicalRegistry[][] HDataNombrePeriodoIntervaloHDataTipoS(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, int periodoTiempo, String intervaloDatosHistoricos, String tipoSeries) {
+
 
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
         int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(), periodoTiempo, intervaloDatosHistoricos, tipoSeries);
-        ArrayList<TechnicalRegistry> res;
+        TechnicalRegistry[][] res;
         List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
         double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
+
+
         switch (nombreIndicador.toUpperCase()) {
 
             case "SMA":
@@ -65,9 +132,8 @@ public class PeticionesTerceros {
                 res = TALibDemo.ejecutarOperacionT3(list, periodoTiempo);
                 break;
             case "RSI":
-                res = TALibDemo.RSICall(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionRSI(list, periodoTiempo);
                 break;
-
             default:
                 res = null;
                 System.out.println("No existe ese indicador!");
@@ -84,6 +150,7 @@ public class PeticionesTerceros {
         this.repositorioActivos.save(resActivo);
         return res;
     }
+
 
 
     public AssetPrice getLivePriceRapidApi(String parBase, String parContra) {
@@ -137,7 +204,7 @@ public class PeticionesTerceros {
                 } else {
                     return null;
                 }
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 System.out.println("Se ha intentado obtener un activo que no existe en BINANCE");
                 return null;
             }

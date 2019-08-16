@@ -17,9 +17,11 @@ public class TechnicalIndicatorWrapper
     @ApiModelProperty(notes="Interval of the technical indicator (20,50,100,200,500...)",example = "20")
     private int interval;
     @ApiModelProperty(notes="Raw technical data",example = "{ numRegistry : 1 , historicPrice : 10234 , technicalIndicator : 22.43 , date : 1563700393 }")
-    private ArrayList<TechnicalRegistry> rawTechnicalData =new ArrayList<>();
+    //private ArrayList<TechnicalRegistry> rawTechnicalData =new ArrayList<>();
+    private TechnicalRegistry [][] rawTechnicalData;
 
-    public TechnicalIndicatorWrapper(String indicatorName, String historicPeriod, String seriesType, int interval, ArrayList<TechnicalRegistry> rawTechnicalData) {
+
+    public TechnicalIndicatorWrapper(String indicatorName, String historicPeriod, String seriesType, int interval,TechnicalRegistry [][] rawTechnicalData) {
         this.indicatorName = indicatorName;
         this.historicPeriod = historicPeriod;
         this.seriesType = seriesType;
@@ -74,11 +76,11 @@ public class TechnicalIndicatorWrapper
         this.interval = interval;
     }
 
-    public ArrayList<TechnicalRegistry> getRawTechnicalData() {
+    public TechnicalRegistry[][] getRawTechnicalData() {
         return rawTechnicalData;
     }
 
-    public void setRawTechnicalData(ArrayList<TechnicalRegistry> rawTechnicalData) {
+    public void setRawTechnicalData(TechnicalRegistry[][] rawTechnicalData) {
         this.rawTechnicalData = rawTechnicalData;
     }
 }

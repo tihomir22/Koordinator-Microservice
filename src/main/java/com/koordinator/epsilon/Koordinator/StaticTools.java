@@ -27,4 +27,24 @@ public class StaticTools {
         }
         return -1;
     }
+
+    public static int buscarIndicadorSimple(ArrayList<TechnicalIndicatorWrapper> indicadorTecnicos, String indicadorBuscado, String periodoHistorico) {
+        for (int i = 0; i < indicadorTecnicos.size(); i++) {
+            TechnicalIndicatorWrapper indicadorTecnico = indicadorTecnicos.get(i);
+            if (indicadorTecnico.getIndicatorName().equalsIgnoreCase(indicadorBuscado) && indicadorTecnico.getHistoricPeriod().equalsIgnoreCase(periodoHistorico)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int buscarIndicadorSimpleConSeries(ArrayList<TechnicalIndicatorWrapper> indicadorTecnicos, String indicadorBuscado, String periodoHistorico,String seriesType) {
+        for (int i = 0; i < indicadorTecnicos.size(); i++) {
+            TechnicalIndicatorWrapper indicadorTecnico = indicadorTecnicos.get(i);
+            if (indicadorTecnico.getIndicatorName().equalsIgnoreCase(indicadorBuscado) && indicadorTecnico.getHistoricPeriod().equalsIgnoreCase(periodoHistorico) && indicadorTecnico.getSeriesType().equalsIgnoreCase(seriesType)) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

@@ -13,6 +13,43 @@ public class ValidacionesEstaticas {
     public static String intervaloHistorico = "historicInterval";
     public static String intervaloPeriodoIndicador = "indicatorInterval";
     public static String tipoSeriesIndicador = "seriesType";
+    public static String fastKPeriod="fKperiod";
+    public static String slowKPeriod="sKperiod";
+    public static String KMAType="kMaType";
+    public static String DMAType="dMaType";
+    public static String slowDPeriod="sDperiod";
+    public static String MACDfastPeriod="fastPeriod";
+    public static String MACDslowPeriod="slowPeriod";
+    public static String MACDsignalPeriod="signalPeriod";
+
+
+    public static boolean validacionSimboloIntervaloTipoSeries(Map<String,String> parametrosRecibidos){
+        if(parametrosRecibidos.containsKey(nombreParBase)
+                && parametrosRecibidos.containsKey(nombreParContra)
+                && parametrosRecibidos.containsKey(intervaloHistorico)
+        && parametrosRecibidos.containsKey(tipoSeriesIndicador)){
+            if(esIntervaloDeBinance(parametrosRecibidos.get(intervaloHistorico))){
+                return true;
+            }else{
+                throw new ActivoNoEncontradoException("You have introduced an invalid series type , valid ones are : open close low high");
+            }
+        }else {
+            throw new ActivoNoEncontradoException("You trying to make a request without all the required parameters!");
+        }
+    }
+
+
+    public static boolean validacionSimboloIntervalo(Map<String,String> parametrosRecibidos){
+        if(parametrosRecibidos.containsKey(nombreParBase) && parametrosRecibidos.containsKey(nombreParContra) && parametrosRecibidos.containsKey(intervaloHistorico)){
+            if(esIntervaloDeBinance(parametrosRecibidos.get(intervaloHistorico))){
+                return true;
+            }else{
+                throw new ActivoNoEncontradoException("You have introduced an invalid series type , valid ones are : open close low high");
+            }
+        }else {
+            throw new ActivoNoEncontradoException("You trying to make a request without all the required parameters!");
+        }
+    }
 
 
     public static boolean validacionSMA(Map<String, String> parametrosRecibidos) {
@@ -21,14 +58,14 @@ public class ValidacionesEstaticas {
                 if(comprobarTipoSeries(parametrosRecibidos.get(tipoSeriesIndicador))){
                     return true;
                 }else{
-                    throw new ActivoNoEncontradoException("Has introducido un tipo de serie incorrecto! , los aceptados son : open close low high");
+                    throw new ActivoNoEncontradoException("You have introduced an invalid series type , valid ones are : open close low high");
                 }
             } else {
-                throw new ActivoNoEncontradoException("Has introducido un intervalo incorrecto! , los aceptados son : 3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w");
+                throw new ActivoNoEncontradoException("You have introduce an invalid timeframe , valid ones are : 3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w");
             }
 
         } else {
-            throw new ActivoNoEncontradoException("Te falta alguna variable obligatoria por introducir o has introducido un nombre incorrecto!");
+            throw new ActivoNoEncontradoException("You trying to make a request without all the required parameters!");
         }
     }
 

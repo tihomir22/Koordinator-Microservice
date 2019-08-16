@@ -30,7 +30,7 @@ public class DbSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        this.recogerYActualizarPreciosMongo();
+        //this.recogerYActualizarPreciosMongo();
     }
 
     @Async
@@ -55,7 +55,7 @@ public class DbSeeder implements CommandLineRunner {
                 TechnicalIndicatorWrapper indicadorTecnico = precioActivo.getIndicatorList().get(i);
                 int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getHistoricData(), indicadorTecnico.getHistoricPeriod());
                 if (resIntervalo != -1) {
-                    indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.calcularMediaMovil(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getInterval(), indicadorTecnico.getHistoricPeriod(), indicadorTecnico.getSeriesType()));
+                    indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getInterval(), indicadorTecnico.getHistoricPeriod(), indicadorTecnico.getSeriesType()));
                     precioActivo.getIndicatorList().set(i, indicadorTecnico);
                     this.repositorioActivos.save(precioActivo);
                 }
