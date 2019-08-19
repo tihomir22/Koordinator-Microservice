@@ -135,6 +135,7 @@ public class PeticionesTerceros {
             lista.set(resBusquedaIndicador, indicadorTecnico);
         }
         resActivo.setIndicatorList(lista);
+        //sukamadika
         this.repositorioActivos.save(resActivo);
         return res;
     }
