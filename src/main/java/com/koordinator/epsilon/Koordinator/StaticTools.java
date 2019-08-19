@@ -38,6 +38,16 @@ public class StaticTools {
         return -1;
     }
 
+    public static int buscarIndicadorSimpleConIntervalo(ArrayList<TechnicalIndicatorWrapper> indicadorTecnicos, String indicadorBuscado, String periodoHistorico,int periodo) {
+        for (int i = 0; i < indicadorTecnicos.size(); i++) {
+            TechnicalIndicatorWrapper indicadorTecnico = indicadorTecnicos.get(i);
+            if (indicadorTecnico.getIndicatorName().equalsIgnoreCase(indicadorBuscado) && indicadorTecnico.getHistoricPeriod().equalsIgnoreCase(periodoHistorico) && indicadorTecnico.getInterval()==periodo) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static int buscarIndicadorSimpleConSeries(ArrayList<TechnicalIndicatorWrapper> indicadorTecnicos, String indicadorBuscado, String periodoHistorico,String seriesType) {
         for (int i = 0; i < indicadorTecnicos.size(); i++) {
             TechnicalIndicatorWrapper indicadorTecnico = indicadorTecnicos.get(i);

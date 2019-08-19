@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.koordinator.epsilon.Koordinator.Excepciones.ActivoNoEncontradoException;
 import com.koordinator.epsilon.Koordinator.Excepciones.ExceptionResponse;
 import com.koordinator.epsilon.Koordinator.StaticTools;
-import com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas;
+import com.koordinator.epsilon.Koordinator.Validaciones.MetacortexStaticLibrary.ValidacionesEstaticas;
 import com.koordinator.epsilon.Koordinator.entidades.*;
 import com.koordinator.epsilon.Koordinator.repositorio.RepositorioActivos;
 import org.json.JSONArray;
@@ -22,8 +22,7 @@ import rx.Observable;
 import java.io.IOException;
 import java.util.*;
 
-import static com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas.intervaloHistorico;
-import static com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas.tipoSeriesIndicador;
+import static com.koordinator.epsilon.Koordinator.Validaciones.MetacortexStaticLibrary.ValidacionesEstaticas.*;
 
 @Service
 public class PeticionesTerceros {
@@ -31,24 +30,24 @@ public class PeticionesTerceros {
     private RepositorioActivos repositorioActivos;
 
 
-    public TechnicalRegistry[][] HDataNombreIntervaloHData(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador,Map<String,String> queryParams){
+    public TechnicalRegistry[][] HDataNombreIntervaloHData(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
-        int resBusquedaIndicador=StaticTools.buscarIndicadorSimple(lista,nombreIndicador.toUpperCase(),queryParams.get(intervaloHistorico));
+        int resBusquedaIndicador = StaticTools.buscarIndicadorSimple(lista, nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico));
         TechnicalRegistry[][] res;
         TALibDemo.inicializar(listaDatosHistoricos);
 
-        switch (nombreIndicador.toUpperCase()){
-            case "STOCH":
+        switch (nombreIndicador.toUpperCase()) {
+            case "STOCHASTIC":
                 rx.Observable<HistoricData> source = Observable.from(listaDatosHistoricos);
                 List<Double> listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
                 List<Double> listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
                 List<Double> listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
-                res = TALibDemo.ejecutarOperacionSTOCH( listaCierre,listaMaximo,listaMinimo,queryParams);
+                res = TALibDemo.ejecutarOperacionSTOCH(listaCierre, listaMaximo, listaMinimo, queryParams);
                 break;
-                default:
-                    res = null;
-                    System.out.println("No existe ese indicador!");
+            default:
+                res = null;
+                System.out.println("No existe ese indicador!");
         }
 
         TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, -1, res);
@@ -62,25 +61,74 @@ public class PeticionesTerceros {
         return res;
     }
 
-    public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeries(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador,Map<String,String> queryParams){
+    public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeriesIntervaloIndicador(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
-        int resBusquedaIndicador=StaticTools.buscarIndicadorSimpleConSeries(lista,nombreIndicador.toUpperCase(),queryParams.get(intervaloHistorico),queryParams.get(tipoSeriesIndicador));
+        int resBusquedaIndicador = StaticTools.buscarIndicadorSimpleConIntervalo(lista, nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), Integer.parseInt(queryParams.get(intervaloPeriodoIndicador)));
+        TechnicalRegistry[][] res;
+        TALibDemo.inicializar(listaDatosHistoricos);
+        List<Double> listaCierre;
+        List<Double> listaMaximo;
+        List<Double> listaMinimo;
+        rx.Observable<HistoricData> source;
+
+        switch (nombreIndicador.toUpperCase()) {
+            case "ADX":
+                source = Observable.from(listaDatosHistoricos);
+                listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
+                listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
+                res = TALibDemo.ejecutarOperacionADX(listaCierre, listaMaximo, listaMinimo, queryParams);
+                break;
+            case "CCI":
+                source = Observable.from(listaDatosHistoricos);
+                listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
+                listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
+                res = TALibDemo.ejecutarOperacionCCI(listaCierre, listaMaximo, listaMinimo, queryParams);
+                break;
+            case "AROON":
+                source = Observable.from(listaDatosHistoricos);
+                listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
+                listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
+                res = TALibDemo.ejecutarOperacionAARON(listaMaximo, listaMinimo, queryParams);
+                break;
+
+            default:
+                res = null;
+                System.out.println("No existe ese indicador!");
+        }
+
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, Integer.parseInt(queryParams.get(intervaloPeriodoIndicador)), res);
+        if (resBusquedaIndicador == -1) {
+            lista.add(indicadorTecnico);
+        } else {
+            lista.set(resBusquedaIndicador, indicadorTecnico);
+        }
+        resActivo.setIndicatorList(lista);
+        this.repositorioActivos.save(resActivo);
+        return res;
+    }
+
+    public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeries(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
+        ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
+        ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
+        int resBusquedaIndicador = StaticTools.buscarIndicadorSimpleConSeries(lista, nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), queryParams.get(tipoSeriesIndicador));
         TechnicalRegistry[][] res;
         TALibDemo.inicializar(listaDatosHistoricos);
 
-        switch (nombreIndicador.toUpperCase()){
+        switch (nombreIndicador.toUpperCase()) {
             case "MACD":
                 rx.Observable<HistoricData> source = Observable.from(listaDatosHistoricos);
                 List<Double> listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
-                res=TALibDemo.ejecutarOperacionMACD(listaCierre,queryParams);
+                res = TALibDemo.ejecutarOperacionMACD(listaCierre, queryParams);
                 break;
             default:
                 res = null;
                 System.out.println("No existe ese indicador!");
         }
 
-        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, -1, res);
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), queryParams.get(tipoSeriesIndicador), -1, res);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
         } else {
@@ -150,7 +198,6 @@ public class PeticionesTerceros {
         this.repositorioActivos.save(resActivo);
         return res;
     }
-
 
 
     public AssetPrice getLivePriceRapidApi(String parBase, String parContra) {

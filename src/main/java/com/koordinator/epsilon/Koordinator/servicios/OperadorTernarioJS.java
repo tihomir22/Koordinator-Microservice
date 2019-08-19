@@ -1,6 +1,6 @@
 package com.koordinator.epsilon.Koordinator.servicios;
 
-import com.koordinator.epsilon.Koordinator.Validaciones.ValidacionesEstaticas;
+import com.koordinator.epsilon.Koordinator.Validaciones.MetacortexStaticLibrary.ValidacionesEstaticas;
 import com.tictactec.ta.lib.MAType;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;

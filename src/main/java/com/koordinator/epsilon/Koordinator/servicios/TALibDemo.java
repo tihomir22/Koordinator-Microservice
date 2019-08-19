@@ -1,5 +1,6 @@
 package com.koordinator.epsilon.Koordinator.servicios;
 
+import com.koordinator.epsilon.Koordinator.Validaciones.MetacortexStaticLibrary.ValidacionesEstaticas;
 import com.koordinator.epsilon.Koordinator.entidades.HistoricData;
 import com.koordinator.epsilon.Koordinator.entidades.TechnicalRegistry;
 import com.tictactec.ta.lib.Core;
@@ -132,7 +133,7 @@ public class TALibDemo {
         double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
-        instanciar(listMaximo);
+        instanciar(listClose);
         return StochasticCall(listClose, listMaximo, listMinimo, queryParams);
     }
 
@@ -141,6 +142,31 @@ public class TALibDemo {
         instanciar(listClose);
         return MACDCall(listClose,queryParams);
     }
+
+    static TechnicalRegistry[][] ejecutarOperacionADX(List<Double> listCierre, List<Double> listMax, List<Double> listMin,Map<String,String>queryParams){
+        double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
+        instanciar(listClose);
+        return ADXCall(listClose,listMaximo,listMinimo,queryParams);
+    }
+
+    static TechnicalRegistry[][] ejecutarOperacionCCI(List<Double> listCierre, List<Double> listMax, List<Double> listMin,Map<String,String>queryParams){
+        double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
+        instanciar(listClose);
+        return CCICall(listClose,listMaximo,listMinimo,queryParams);
+    }
+
+    static TechnicalRegistry[][] ejecutarOperacionAARON( List<Double> listMax, List<Double> listMin,Map<String,String>queryParams){
+        double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
+        instanciar(listMaximo);
+        return AARONCall(listMaximo,listMinimo,queryParams);
+    }
+
+
 
 
     /**
@@ -236,6 +262,43 @@ public class TALibDemo {
         length.value = -1;
         retCode=lib.macd(0,listaPreciosLive.length-1,listaPreciosLive,OperadorTernarioJS.MACDDevolverFastPeriod(queryParams),OperadorTernarioJS.MACDDevolverSlowPeriod(queryParams),OperadorTernarioJS.MACDSignalPeriod(queryParams),begin, length,output, output2,output3);
         return showFinalOutputTriple("MACD","MACD Signal","MACD Histogram");
+    }
+
+    public static TechnicalRegistry[][] ADXCall(double[] listCierre, double[] listMax, double[] listMin,Map<String, String> queryParams) {
+        resetArrayValues();
+        output = new double[listCierre.length];
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        retCode=lib.adx(0,listCierre.length-1,listMax,listMin,listCierre,Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)),begin,length,output);
+        return showFinalOutput("ADX");
+    }
+
+    public static TechnicalRegistry[][] CCICall(double[] listCierre, double[] listMax, double[] listMin,Map<String, String> queryParams) {
+        resetArrayValues();
+        output = new double[listCierre.length];
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        retCode=lib.cci(0,listCierre.length-1,listMax,listMin,listCierre,Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)),begin,length,output);
+        return showFinalOutput("CCI");
+    }
+
+    public static TechnicalRegistry[][] AARONCall(double[] listMax, double[] listMin,Map<String, String> queryParams) {
+        resetArrayValues();
+        output = new double[listMax.length];
+        output2 = new double[listMax.length];
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        retCode=lib.aroon(0,listMax.length-1,listMax,listMin,Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)),begin,length,output,output2);
+        return showFinalOutputDual("Aroon Down","Aroon Up");
     }
 
     public static TechnicalRegistry[][] StochasticCall(double[] listCierre, double[] listMax, double[] listMin, Map<String, String> queryParams) {
