@@ -96,7 +96,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result SMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "sma", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "sma", queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -113,7 +113,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result EMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "ema", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "ema", queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -131,7 +131,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result DEMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "dema", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "dema",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -149,7 +149,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result KAMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "kama", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "kama",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -167,7 +167,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result MAMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "mama", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "mama",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -184,7 +184,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result TEMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "tema", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "tema",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -201,7 +201,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result TMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "tma", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "tma", queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -218,7 +218,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result WMA " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "wma", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "wma",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -235,7 +235,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result T3 " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "t3", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "t3",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -253,7 +253,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result RSI " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "rsi", Integer.parseInt(queryParameters.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), queryParameters.get(ValidacionesEstaticas.intervaloHistorico), queryParameters.get(ValidacionesEstaticas.tipoSeriesIndicador))).orElse(null)));
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "rsi",queryParameters)).orElse(null)));
 
         } else {
             return Optional.of(
@@ -341,9 +341,59 @@ public class ControladorPrecios {
         } else {
             return Optional.of(
                     new RespuestaIndicadorTecnico(400, "Incorrect parameters were given", null));
+    
+        }
+    }
+
+    @GetMapping(value = "technical/bbands/**", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<RespuestaIndicadorTecnico> recuperarBBANDS(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
+        if (ValidacionesEstaticas.validacionSMA(queryParameters)) {
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            return Optional.of(
+                    new RespuestaIndicadorTecnico(200, "Technical result BBANDS " + historico.get().getPeriod(),
+                            historico.map(tipoDatoHistorico ->
+                                    this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(tipoDatoHistorico, resActivo.get(), "bbands",queryParameters)).orElse(null)));
+
+        } else {
+            return Optional.of(
+                    new RespuestaIndicadorTecnico(400, "Incorrect parameters were given", null));
 
         }
     }
 
-//abduscaneee
+    @GetMapping(value = "technical/ad/**", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<RespuestaIndicadorTecnico> recuperarChaikin(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
+        if (ValidacionesEstaticas.validacionSimboloIntervaloHistorico(queryParameters)) {
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            return Optional.of(
+                    new RespuestaIndicadorTecnico(200, "Technical result A/D Chaikin" + historico.get().getPeriod(),
+                            historico.map(tipoDatoHistorico ->
+                                    this.peticionesTerceros.HDataNombreIntervaloHData(tipoDatoHistorico, resActivo.get(), "chaikin",queryParameters)).orElse(null)));
+
+        } else {
+            return Optional.of(
+                    new RespuestaIndicadorTecnico(400, "Incorrect parameters were given", null));
+
+        }
+    }
+
+    @GetMapping(value = "technical/obv/**", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<RespuestaIndicadorTecnico> recuperarOBV(@RequestParam Map<String, String> queryParameters) throws IOException, JSONException {
+        if (ValidacionesEstaticas.validacionSimboloIntervaloHistorico(queryParameters)) {
+            Optional<HistoricDataWrapper> historico = Optional.ofNullable(this.recuperarHistoricoActivo(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase(), queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase(), queryParameters.get(ValidacionesEstaticas.intervaloHistorico)).get().getData());
+            Optional<AssetPrice> resActivo = this.repositorioActivos.findById(queryParameters.get(ValidacionesEstaticas.nombreParBase).toUpperCase() + queryParameters.get(ValidacionesEstaticas.nombreParContra).toUpperCase());
+            return Optional.of(
+                    new RespuestaIndicadorTecnico(200, "Technical result on balance volume (OBV)" + historico.get().getPeriod(),
+                            historico.map(tipoDatoHistorico ->
+                                    this.peticionesTerceros.HDataNombreIntervaloHData(tipoDatoHistorico, resActivo.get(), "obv",queryParameters)).orElse(null)));
+
+        } else {
+            return Optional.of(
+                    new RespuestaIndicadorTecnico(400, "Incorrect parameters were given", null));
+
+        }
+    }
+
 }

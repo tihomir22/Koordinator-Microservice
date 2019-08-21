@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class OperadorTernarioJS {
 
+
     public static int devolverFastK_Period(Map<String, String> queryParams) {
         try {
             if (queryParams.get(ValidacionesEstaticas.fastKPeriod) != null) {
@@ -34,7 +35,7 @@ public class OperadorTernarioJS {
         }
     }
 
-    public static int devolverSlowD_Period(Map<String,String>queryParams){
+    public static int devolverSlowD_Period(Map<String, String> queryParams) {
         try {
             if (queryParams.get(ValidacionesEstaticas.slowDPeriod) != null) {
                 return Integer.parseInt(queryParams.get(ValidacionesEstaticas.slowDPeriod));
@@ -73,43 +74,66 @@ public class OperadorTernarioJS {
     public static MAType KdevolverMATypeBasadaEnNumero(Map<String, String> queryParams) {
         if (queryParams.get(ValidacionesEstaticas.KMAType) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.KMAType))) {
             return devolverMA(Integer.parseInt(queryParams.get(ValidacionesEstaticas.KMAType)));
-        }else{
+        } else {
             return devolverMA(0);
+        }
+    }
+
+    static MAType BBANDSdevolverMATypeBasadaEnNumero(Map<String, String> queryParams) {
+        if (queryParams.get(ValidacionesEstaticas.generalMATypeParameter) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.generalMATypeParameter))) {
+            return devolverMA(Integer.parseInt(queryParams.get(ValidacionesEstaticas.generalMATypeParameter)));
+        } else {
+            return devolverMA(0);
+        }
+    }
+
+    static int devolverBBANDSDesviationUpper(Map<String, String> queryParams) {
+        if (queryParams.get(ValidacionesEstaticas.BBANDSDesviacionArriba) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.BBANDSDesviacionArriba))) {
+            return Integer.parseInt(queryParams.get(ValidacionesEstaticas.BBANDSDesviacionArriba));
+        } else {
+            return 2;
+        }
+    }
+
+    static int devolverBBANDSDesviationLower(Map<String, String> queryParams) {
+        if (queryParams.get(ValidacionesEstaticas.BBANDSDesviacionAbajo) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.BBANDSDesviacionAbajo))) {
+            return Integer.parseInt(queryParams.get(ValidacionesEstaticas.BBANDSDesviacionAbajo));
+        } else {
+            return 2;
         }
     }
 
     public static MAType DdevolverMATypeBasadaEnNumero(Map<String, String> queryParams) {
         if (queryParams.get(ValidacionesEstaticas.DMAType) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.DMAType))) {
             return devolverMA(Integer.parseInt(queryParams.get(ValidacionesEstaticas.DMAType)));
-        }else{
+        } else {
             return devolverMA(0);
         }
     }
 
-    public static int MACDDevolverFastPeriod(Map<String,String> queryParams){
-        if(queryParams.get(ValidacionesEstaticas.MACDfastPeriod)!=null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.MACDfastPeriod))){
+    public static int MACDDevolverFastPeriod(Map<String, String> queryParams) {
+        if (queryParams.get(ValidacionesEstaticas.MACDfastPeriod) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.MACDfastPeriod))) {
             return Integer.parseInt(queryParams.get(ValidacionesEstaticas.MACDfastPeriod));
-        }else{
+        } else {
             return 12;
         }
     }
 
-    public static int MACDDevolverSlowPeriod(Map<String,String>queryParams){
-        if(queryParams.get(ValidacionesEstaticas.MACDslowPeriod)!=null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.MACDslowPeriod))){
+    public static int MACDDevolverSlowPeriod(Map<String, String> queryParams) {
+        if (queryParams.get(ValidacionesEstaticas.MACDslowPeriod) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.MACDslowPeriod))) {
             return Integer.parseInt(queryParams.get(ValidacionesEstaticas.MACDslowPeriod));
-        }else{
+        } else {
             return 26;
         }
     }
 
-    public static int MACDSignalPeriod(Map<String,String>queryParams){
-        if(queryParams.get(ValidacionesEstaticas.MACDsignalPeriod)!=null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.MACDsignalPeriod))){
+    public static int MACDSignalPeriod(Map<String, String> queryParams) {
+        if (queryParams.get(ValidacionesEstaticas.MACDsignalPeriod) != null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.MACDsignalPeriod))) {
             return Integer.parseInt(queryParams.get(ValidacionesEstaticas.MACDsignalPeriod));
-        }else{
+        } else {
             return 9;
         }
     }
-
 
 
 }

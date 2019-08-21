@@ -4,6 +4,7 @@ import com.koordinator.epsilon.Koordinator.entidades.HistoricDataWrapper;
 import com.koordinator.epsilon.Koordinator.entidades.TechnicalIndicatorWrapper;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class StaticTools {
     public static int buscarIntervalo(ArrayList<HistoricDataWrapper> lista, String intervalo) {
@@ -22,6 +23,16 @@ public class StaticTools {
                     indicadorTecnico.getInterval() == intervalo &&
                     indicadorTecnico.getHistoricPeriod().equalsIgnoreCase(periodoDatosHistoricos) &&
                     indicadorTecnico.getSeriesType().equalsIgnoreCase(tipoSeries)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int buscarIndicadorPorQueryParams(ArrayList<TechnicalIndicatorWrapper>indicatoresTecnicos, Map<String,String> queryParams){
+        for (int i=0;i<indicatoresTecnicos.size();i++){
+            TechnicalIndicatorWrapper indicadorTecnico = indicatoresTecnicos.get(i);
+            if(indicadorTecnico.getQueryParameters().equals(queryParams)){
                 return i;
             }
         }

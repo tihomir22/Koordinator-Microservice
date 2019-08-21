@@ -129,6 +129,20 @@ public class TALibDemo {
         return RSICall(list, periodoTiempo);
     }
 
+    public static TechnicalRegistry[][] ejecutarOperacionBBANDS(double[] list, int periodoTiempo, Map<String, String> queryParameters) {
+        instanciar(list);
+        return BBANDSCall(list, periodoTiempo, queryParameters);
+    }
+
+    static TechnicalRegistry[][] ejecutarOperacionAD(List<Double> listCierre, List<Double> listMax, List<Double> listMin, List<Double> listaHistorica, Map<String, String> queryParams) {
+        double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listaVolumen = listaHistorica.stream().mapToDouble(Double::doubleValue).toArray();
+        instanciar(listClose);
+        return ChaikinCall(listClose, listMaximo, listMinimo, listaVolumen, queryParams);
+    }
+
     public static TechnicalRegistry[][] ejecutarOperacionSTOCH(List<Double> listCierre, List<Double> listMax, List<Double> listMin, Map<String, String> queryParams) {
         double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
@@ -140,33 +154,38 @@ public class TALibDemo {
     public static TechnicalRegistry[][] ejecutarOperacionMACD(List<Double> listCerrada, Map<String, String> queryParams) {
         double[] listClose = listCerrada.stream().mapToDouble(Double::doubleValue).toArray();
         instanciar(listClose);
-        return MACDCall(listClose,queryParams);
+        return MACDCall(listClose, queryParams);
     }
 
-    static TechnicalRegistry[][] ejecutarOperacionADX(List<Double> listCierre, List<Double> listMax, List<Double> listMin,Map<String,String>queryParams){
+    static TechnicalRegistry[][] ejecutarOperacionADX(List<Double> listCierre, List<Double> listMax, List<Double> listMin, Map<String, String> queryParams) {
         double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
         instanciar(listClose);
-        return ADXCall(listClose,listMaximo,listMinimo,queryParams);
+        return ADXCall(listClose, listMaximo, listMinimo, queryParams);
     }
 
-    static TechnicalRegistry[][] ejecutarOperacionCCI(List<Double> listCierre, List<Double> listMax, List<Double> listMin,Map<String,String>queryParams){
+    static TechnicalRegistry[][] ejecutarOperacionCCI(List<Double> listCierre, List<Double> listMax, List<Double> listMin, Map<String, String> queryParams) {
         double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
         instanciar(listClose);
-        return CCICall(listClose,listMaximo,listMinimo,queryParams);
+        return CCICall(listClose, listMaximo, listMinimo, queryParams);
     }
 
-    static TechnicalRegistry[][] ejecutarOperacionAARON( List<Double> listMax, List<Double> listMin,Map<String,String>queryParams){
+    static TechnicalRegistry[][] ejecutarOperacionAARON(List<Double> listMax, List<Double> listMin, Map<String, String> queryParams) {
         double[] listMaximo = listMax.stream().mapToDouble(Double::doubleValue).toArray();
         double[] listMinimo = listMin.stream().mapToDouble(Double::doubleValue).toArray();
         instanciar(listMaximo);
-        return AARONCall(listMaximo,listMinimo,queryParams);
+        return AARONCall(listMaximo, listMinimo, queryParams);
     }
 
-
+    static TechnicalRegistry[][] ejecutarOperacionOBV(List<Double> listCierre, List<Double> listVolumen, Map<String, String> queryParams) {
+        double[] listClose = listCierre.stream().mapToDouble(Double::doubleValue).toArray();
+        double[] listVol = listVolumen.stream().mapToDouble(Double::doubleValue).toArray();
+        instanciar(listClose);
+        return OBVCall(listClose, listVol, queryParams);
+    }
 
 
     /**
@@ -229,7 +248,7 @@ public class TALibDemo {
         return listaResultante;
     }
 
-    private static TechnicalRegistry[][] showFinalOutputTriple(String mensajeA, String mensajeB,String mensajeC) {
+    private static TechnicalRegistry[][] showFinalOutputTriple(String mensajeA, String mensajeB, String mensajeC) {
         int j = 0;
         TechnicalRegistry[][] listaResultante = new TechnicalRegistry[output.length][3];
         for (int i = 0; i < output.length; i++) {
@@ -244,27 +263,27 @@ public class TALibDemo {
                 // listaResultante.add(new TechnicalRegistry(i, close[i], 0, new Date(stamp.getTime())));
                 listaResultante[i][0] = new TechnicalRegistry(i, mensajeA + " #" + i, close[i], 0, new Date(stamp.getTime()));
                 listaResultante[i][1] = new TechnicalRegistry(i, mensajeB + " #" + i, close[i], 0, new Date(stamp.getTime()));
-                listaResultante[i][2] = new TechnicalRegistry(i, mensajeC + " #" + i, close[i],0, new Date(stamp.getTime()));
+                listaResultante[i][2] = new TechnicalRegistry(i, mensajeC + " #" + i, close[i], 0, new Date(stamp.getTime()));
             }
         }
         return listaResultante;
     }
 
-    public static TechnicalRegistry[][] MACDCall(double[] listaPreciosLive,Map<String, String> queryParams) {
+    public static TechnicalRegistry[][] MACDCall(double[] listaPreciosLive, Map<String, String> queryParams) {
         resetArrayValues();
         output = new double[listaPreciosLive.length];
         output2 = new double[listaPreciosLive.length];
-        output3=new double[listaPreciosLive.length];
+        output3 = new double[listaPreciosLive.length];
         MInteger begin = new MInteger();
         MInteger length = new MInteger();
         RetCode retCode = RetCode.InternalError;
         begin.value = -1;
         length.value = -1;
-        retCode=lib.macd(0,listaPreciosLive.length-1,listaPreciosLive,OperadorTernarioJS.MACDDevolverFastPeriod(queryParams),OperadorTernarioJS.MACDDevolverSlowPeriod(queryParams),OperadorTernarioJS.MACDSignalPeriod(queryParams),begin, length,output, output2,output3);
-        return showFinalOutputTriple("MACD","MACD Signal","MACD Histogram");
+        retCode = lib.macd(0, listaPreciosLive.length - 1, listaPreciosLive, OperadorTernarioJS.MACDDevolverFastPeriod(queryParams), OperadorTernarioJS.MACDDevolverSlowPeriod(queryParams), OperadorTernarioJS.MACDSignalPeriod(queryParams), begin, length, output, output2, output3);
+        return showFinalOutputTriple("MACD", "MACD Signal", "MACD Histogram");
     }
 
-    public static TechnicalRegistry[][] ADXCall(double[] listCierre, double[] listMax, double[] listMin,Map<String, String> queryParams) {
+    public static TechnicalRegistry[][] ADXCall(double[] listCierre, double[] listMax, double[] listMin, Map<String, String> queryParams) {
         resetArrayValues();
         output = new double[listCierre.length];
         MInteger begin = new MInteger();
@@ -272,11 +291,11 @@ public class TALibDemo {
         RetCode retCode = RetCode.InternalError;
         begin.value = -1;
         length.value = -1;
-        retCode=lib.adx(0,listCierre.length-1,listMax,listMin,listCierre,Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)),begin,length,output);
+        retCode = lib.adx(0, listCierre.length - 1, listMax, listMin, listCierre, Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), begin, length, output);
         return showFinalOutput("ADX");
     }
 
-    public static TechnicalRegistry[][] CCICall(double[] listCierre, double[] listMax, double[] listMin,Map<String, String> queryParams) {
+    public static TechnicalRegistry[][] CCICall(double[] listCierre, double[] listMax, double[] listMin, Map<String, String> queryParams) {
         resetArrayValues();
         output = new double[listCierre.length];
         MInteger begin = new MInteger();
@@ -284,11 +303,11 @@ public class TALibDemo {
         RetCode retCode = RetCode.InternalError;
         begin.value = -1;
         length.value = -1;
-        retCode=lib.cci(0,listCierre.length-1,listMax,listMin,listCierre,Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)),begin,length,output);
+        retCode = lib.cci(0, listCierre.length - 1, listMax, listMin, listCierre, Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), begin, length, output);
         return showFinalOutput("CCI");
     }
 
-    public static TechnicalRegistry[][] AARONCall(double[] listMax, double[] listMin,Map<String, String> queryParams) {
+    public static TechnicalRegistry[][] AARONCall(double[] listMax, double[] listMin, Map<String, String> queryParams) {
         resetArrayValues();
         output = new double[listMax.length];
         output2 = new double[listMax.length];
@@ -297,8 +316,8 @@ public class TALibDemo {
         RetCode retCode = RetCode.InternalError;
         begin.value = -1;
         length.value = -1;
-        retCode=lib.aroon(0,listMax.length-1,listMax,listMin,Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)),begin,length,output,output2);
-        return showFinalOutputDual("Aroon Down","Aroon Up");
+        retCode = lib.aroon(0, listMax.length - 1, listMax, listMin, Integer.parseInt(queryParams.get(ValidacionesEstaticas.intervaloPeriodoIndicador)), begin, length, output, output2);
+        return showFinalOutputDual("Aroon Down", "Aroon Up");
     }
 
     public static TechnicalRegistry[][] StochasticCall(double[] listCierre, double[] listMax, double[] listMin, Map<String, String> queryParams) {
@@ -313,6 +332,32 @@ public class TALibDemo {
         length.value = -1;
         retCode = lib.stoch(0, listCierre.length - 1, listMax, listMin, listCierre, OperadorTernarioJS.devolverFastK_Period(queryParams), OperadorTernarioJS.devolverSlowK_Period(queryParams), OperadorTernarioJS.KdevolverMATypeBasadaEnNumero(queryParams), OperadorTernarioJS.devolverSlowD_Period(queryParams), OperadorTernarioJS.DdevolverMATypeBasadaEnNumero(queryParams), begin, length, output, output2);
         return showFinalOutputDual("SlowK", "SlowD");
+    }
+
+    public static TechnicalRegistry[][] ChaikinCall(double[] listCierre, double[] listMax, double[] listMin, double[] listVolumen, Map<String, String> queryParams) {
+        resetArrayValues();
+        output = new double[listCierre.length];
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        //high low close volume
+        retCode = lib.ad(0, listCierre.length - 1, listMax, listMin, listCierre, listVolumen, begin, length, output);
+        return showFinalOutput("Acumulation Distribution Line");
+    }
+
+    static TechnicalRegistry[][] OBVCall(double[] listCierre, double[] listVolumen, Map<String, String> queryParams) {
+        resetArrayValues();
+        output = new double[listCierre.length];
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        //high low close volume
+        retCode = lib.obv(0, listCierre.length - 1, listCierre, listVolumen, begin, length, output);
+        return showFinalOutput("On Balance Volume (OBV)");
     }
 
 
@@ -331,6 +376,22 @@ public class TALibDemo {
             output[i] = tempOutPut[i - period];
         }
         return showFinalOutput("RSI Registry");
+    }
+
+    static TechnicalRegistry[][] BBANDSCall(double[] prices, int period, Map<String, String> queryParams) {
+        resetArrayValues();
+        output = new double[prices.length];
+        output2 = new double[prices.length];
+        output3 = new double[prices.length];
+
+        MInteger begin = new MInteger();
+        MInteger length = new MInteger();
+        RetCode retCode = RetCode.InternalError;
+        begin.value = -1;
+        length.value = -1;
+        retCode = lib.bbands(0, prices.length - 1, prices, period, OperadorTernarioJS.devolverBBANDSDesviationUpper(queryParams), OperadorTernarioJS.devolverBBANDSDesviationLower(queryParams), OperadorTernarioJS.BBANDSdevolverMATypeBasadaEnNumero(queryParams), begin, length, output, output2, output3);
+
+        return showFinalOutputTriple("UpperBand", "MiddleBand", "LowerBand");
     }
 
 

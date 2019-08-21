@@ -36,21 +36,40 @@ public class PeticionesTerceros {
         int resBusquedaIndicador = StaticTools.buscarIndicadorSimple(lista, nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico));
         TechnicalRegistry[][] res;
         TALibDemo.inicializar(listaDatosHistoricos);
+        List<Double> listaCierre;
+        List<Double> listaMaximo;
+        List<Double> listaMinimo;
+        List<Double> listVolumen;
+        rx.Observable<HistoricData> source;
 
         switch (nombreIndicador.toUpperCase()) {
             case "STOCHASTIC":
-                rx.Observable<HistoricData> source = Observable.from(listaDatosHistoricos);
-                List<Double> listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
-                List<Double> listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
-                List<Double> listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
+                source = Observable.from(listaDatosHistoricos);
+                listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
+                listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
                 res = TALibDemo.ejecutarOperacionSTOCH(listaCierre, listaMaximo, listaMinimo, queryParams);
+                break;
+            case "CHAIKIN":
+                source = Observable.from(listaDatosHistoricos);
+                listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                listaMaximo = source.map(dato -> dato.getHigh()).toList().toBlocking().single();
+                listaMinimo = source.map(dato -> dato.getLow()).toList().toBlocking().single();
+                listVolumen = source.map(dato -> dato.getVolume()).toList().toBlocking().single();
+                res = TALibDemo.ejecutarOperacionAD(listaCierre, listaMaximo, listaMinimo, listVolumen, queryParams);
+                break;
+            case "OBV":
+                source = Observable.from(listaDatosHistoricos);
+                listaCierre = source.map(dato -> dato.getClose()).toList().toBlocking().single();
+                listVolumen = source.map(dato -> dato.getVolume()).toList().toBlocking().single();
+                res = TALibDemo.ejecutarOperacionOBV(listaCierre, listVolumen, queryParams);
                 break;
             default:
                 res = null;
                 System.out.println("No existe ese indicador!");
         }
 
-        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, -1, res);
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, -1, res, queryParams);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
         } else {
@@ -99,7 +118,7 @@ public class PeticionesTerceros {
                 System.out.println("No existe ese indicador!");
         }
 
-        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, Integer.parseInt(queryParams.get(intervaloPeriodoIndicador)), res);
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), null, Integer.parseInt(queryParams.get(intervaloPeriodoIndicador)), res, queryParams);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
         } else {
@@ -128,60 +147,62 @@ public class PeticionesTerceros {
                 System.out.println("No existe ese indicador!");
         }
 
-        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), queryParams.get(tipoSeriesIndicador), -1, res);
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), queryParams.get(tipoSeriesIndicador), -1, res, queryParams);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
         } else {
             lista.set(resBusquedaIndicador, indicadorTecnico);
         }
         resActivo.setIndicatorList(lista);
-        //sukamadika
         this.repositorioActivos.save(resActivo);
         return res;
     }
 
-    public TechnicalRegistry[][] HDataNombrePeriodoIntervaloHDataTipoS(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, int periodoTiempo, String intervaloDatosHistoricos, String tipoSeries) {
+    public TechnicalRegistry[][] HDataNombrePeriodoIntervaloHDataTipoS(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParameters) {
 
 
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
-        int resBusquedaIndicador = StaticTools.buscarIndicador(lista, nombreIndicador.toUpperCase(), periodoTiempo, intervaloDatosHistoricos, tipoSeries);
+        int resBusquedaIndicador = StaticTools.buscarIndicadorPorQueryParams(lista, queryParameters);
         TechnicalRegistry[][] res;
-        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, periodoTiempo, tipoSeries);
+        List<Double> observableRes = TALibDemo.inicializar(listaDatosHistoricos, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)), queryParameters.get(tipoSeriesIndicador));
         double[] list = observableRes.stream().mapToDouble(Double::doubleValue).toArray();
 
 
         switch (nombreIndicador.toUpperCase()) {
 
             case "SMA":
-                res = TALibDemo.ejecutarOperacionSMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionSMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "EMA":
-                res = TALibDemo.ejecutarOperacionEMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionEMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "DEMA":
-                res = TALibDemo.ejecutarOperacionDEMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionDEMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "KAMA":
-                res = TALibDemo.ejecutarOperacionKAMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionKAMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "MAMA":
-                res = TALibDemo.ejecutarOperacionMAMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionMAMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "TEMA":
-                res = TALibDemo.ejecutarOperacionTEMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionTEMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "TMA":
-                res = TALibDemo.ejecutarOperacionTMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionTMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "WMA":
-                res = TALibDemo.ejecutarOperacionWMA(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionWMA(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "T3":
-                res = TALibDemo.ejecutarOperacionT3(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionT3(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
                 break;
             case "RSI":
-                res = TALibDemo.ejecutarOperacionRSI(list, periodoTiempo);
+                res = TALibDemo.ejecutarOperacionRSI(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)));
+                break;
+            case "BBANDS":
+                res = TALibDemo.ejecutarOperacionBBANDS(list, Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)), queryParameters);
                 break;
             default:
                 res = null;
@@ -189,13 +210,14 @@ public class PeticionesTerceros {
         }
 
 
-        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), intervaloDatosHistoricos, tipoSeries, periodoTiempo, res);
+        TechnicalIndicatorWrapper indicadorTecnico = new TechnicalIndicatorWrapper(nombreIndicador.toUpperCase(), queryParameters.get(intervaloHistorico), queryParameters.get(tipoSeriesIndicador), Integer.parseInt(queryParameters.get(intervaloPeriodoIndicador)), res, queryParameters);
         if (resBusquedaIndicador == -1) {
             lista.add(indicadorTecnico);
         } else {
             lista.set(resBusquedaIndicador, indicadorTecnico);
         }
         resActivo.setIndicatorList(lista);
+
         this.repositorioActivos.save(resActivo);
         return res;
     }

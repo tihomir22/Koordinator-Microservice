@@ -1,9 +1,12 @@
 package com.koordinator.epsilon.Koordinator.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 @ApiModel(description="Technical indicator wrapper")
 public class TechnicalIndicatorWrapper
@@ -17,18 +20,20 @@ public class TechnicalIndicatorWrapper
     @ApiModelProperty(notes="Interval of the technical indicator (20,50,100,200,500...)",example = "20")
     private int interval;
     @ApiModelProperty(notes="Raw technical data",example = "{ numRegistry : 1 , historicPrice : 10234 , technicalIndicator : 22.43 , date : 1563700393 }")
-    //private ArrayList<TechnicalRegistry> rawTechnicalData =new ArrayList<>();
     private TechnicalRegistry [][] rawTechnicalData;
 
+    @ApiModelProperty(notes="Query parameters used for this indicator",example = "{ base : BTC , counter : USDT , historicInterval : 1h }",hidden = true)
+    private Map<String,String> queryParameters;
 
-    public TechnicalIndicatorWrapper(String indicatorName, String historicPeriod, String seriesType, int interval,TechnicalRegistry [][] rawTechnicalData) {
+
+    public TechnicalIndicatorWrapper(String indicatorName, String historicPeriod, String seriesType, int interval, TechnicalRegistry[][] rawTechnicalData, Map<String, String> queryParameters) {
         this.indicatorName = indicatorName;
         this.historicPeriod = historicPeriod;
         this.seriesType = seriesType;
         this.interval = interval;
         this.rawTechnicalData = rawTechnicalData;
+        this.queryParameters = queryParameters;
     }
-
 
     public TechnicalIndicatorWrapper() {
     }
@@ -40,7 +45,8 @@ public class TechnicalIndicatorWrapper
                 ", historicPeriod='" + historicPeriod + '\'' +
                 ", seriesType='" + seriesType + '\'' +
                 ", interval=" + interval +
-                ", rawTechnicalData=" + rawTechnicalData +
+                ", rawTechnicalData=" + Arrays.toString(rawTechnicalData) +
+                ", queryParameters=" + queryParameters +
                 '}';
     }
 
@@ -82,5 +88,13 @@ public class TechnicalIndicatorWrapper
 
     public void setRawTechnicalData(TechnicalRegistry[][] rawTechnicalData) {
         this.rawTechnicalData = rawTechnicalData;
+    }
+
+    public Map<String, String> getQueryParameters() {
+        return queryParameters;
+    }
+
+    public void setQueryParameters(Map<String, String> queryParameters) {
+        this.queryParameters = queryParameters;
     }
 }

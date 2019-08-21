@@ -12,13 +12,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 //se ejecutará al prinicipio con spring
 @Component
 public class DbSeeder implements CommandLineRunner {
-
+    @Autowired
     private RepositorioActivos repositorioActivos;
 
     @Autowired
@@ -30,7 +31,8 @@ public class DbSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        this.recogerYActualizarPreciosMongo();
+        //this.recogerYActualizarPreciosMongo();
+
     }
 
     @Async
@@ -40,8 +42,8 @@ public class DbSeeder implements CommandLineRunner {
             Thread.sleep(10000);
             List<AssetPrice> arrayActivosMongo = this.repositorioActivos.findAll();
             for (int i = 0; i < arrayActivosMongo.size(); i++) {
-                this.recuperarPrecioAsincrono(arrayActivosMongo.get(i));
-                this.recuperarHistoricoAsincrono(arrayActivosMongo.get(i));
+                //this.recuperarPrecioAsincrono(arrayActivosMongo.get(i));
+               // this.recuperarHistoricoAsincrono(arrayActivosMongo.get(i));
                 this.actualizarIndicadores(arrayActivosMongo.get(i));
             }
         }
@@ -55,7 +57,7 @@ public class DbSeeder implements CommandLineRunner {
                 TechnicalIndicatorWrapper indicadorTecnico = precioActivo.getIndicatorList().get(i);
                 int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getHistoricData(), indicadorTecnico.getHistoricPeriod());
                 if (resIntervalo != -1) {
-                    indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getInterval(), indicadorTecnico.getHistoricPeriod(), indicadorTecnico.getSeriesType()));
+                    indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(),indicadorTecnico.getQueryParameters()));
                     precioActivo.getIndicatorList().set(i, indicadorTecnico);
                     this.repositorioActivos.save(precioActivo);
                 }
@@ -83,6 +85,11 @@ public class DbSeeder implements CommandLineRunner {
             }
             this.repositorioActivos.save(precioActivo);
         }
+    }
+
+    private Map<String,String> returnMapFromString(String toMap){
+        System.out.println(toMap);
+        return null;
     }
 
 }
