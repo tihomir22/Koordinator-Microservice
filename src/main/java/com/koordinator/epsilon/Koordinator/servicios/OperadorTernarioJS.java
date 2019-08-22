@@ -135,5 +135,21 @@ public class OperadorTernarioJS {
         }
     }
 
+    static String getSeriesTypeDefault(Map<String, String> queryparams) {
+        if (queryparams.get(ValidacionesEstaticas.tipoSeriesIndicador) != null) {
+            return queryparams.get(ValidacionesEstaticas.tipoSeriesIndicador);
+        } else {
+            return "close";
+        }
+    }
+
+    static int getIndicatorIntervalDefault(Map<String, String> queryparams) {
+        if (queryparams.get(ValidacionesEstaticas.intervaloPeriodoIndicador) != null && NumberUtils.isCreatable(queryparams.get(ValidacionesEstaticas.MACDsignalPeriod))) {
+            return Integer.parseInt(queryparams.get(ValidacionesEstaticas.intervaloPeriodoIndicador));
+        } else {
+            return -1;
+        }
+    }
+
 
 }

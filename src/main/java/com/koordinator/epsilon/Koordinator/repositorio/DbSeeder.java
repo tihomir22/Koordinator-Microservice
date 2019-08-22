@@ -31,7 +31,7 @@ public class DbSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        //this.recogerYActualizarPreciosMongo();
+        this.recogerYActualizarPreciosMongo();
 
     }
 
@@ -42,8 +42,8 @@ public class DbSeeder implements CommandLineRunner {
             Thread.sleep(10000);
             List<AssetPrice> arrayActivosMongo = this.repositorioActivos.findAll();
             for (int i = 0; i < arrayActivosMongo.size(); i++) {
-                //this.recuperarPrecioAsincrono(arrayActivosMongo.get(i));
-               // this.recuperarHistoricoAsincrono(arrayActivosMongo.get(i));
+                this.recuperarPrecioAsincrono(arrayActivosMongo.get(i));
+                this.recuperarHistoricoAsincrono(arrayActivosMongo.get(i));
                 this.actualizarIndicadores(arrayActivosMongo.get(i));
             }
         }
@@ -57,9 +57,19 @@ public class DbSeeder implements CommandLineRunner {
                 TechnicalIndicatorWrapper indicadorTecnico = precioActivo.getIndicatorList().get(i);
                 int resIntervalo = StaticTools.buscarIntervalo(precioActivo.getHistoricData(), indicadorTecnico.getHistoricPeriod());
                 if (resIntervalo != -1) {
-                    indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(),indicadorTecnico.getQueryParameters()));
+                    if (indicadorTecnico.getInterval() == -1 && indicadorTecnico.getSeriesType() == null) {
+                        indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombreIntervaloHData(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getQueryParameters()));
+                    } else if (indicadorTecnico.getInterval() != -1 && indicadorTecnico.getSeriesType() == null) {
+                        indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombreIntervaloHDataTipoSeriesIntervaloIndicador(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getQueryParameters()));
+                    } else if (indicadorTecnico.getInterval() == -1 && indicadorTecnico.getSeriesType() != null) {
+                        indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombreIntervaloHDataTipoSeriesSinIntervaloIndicador(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getQueryParameters()));
+                    } else {
+                        indicadorTecnico.setRawTechnicalData(this.peticionesTerceros.HDataNombrePeriodoIntervaloHDataTipoS(precioActivo.getHistoricData().get(resIntervalo), precioActivo, indicadorTecnico.getIndicatorName(), indicadorTecnico.getQueryParameters()));
+                    }
                     precioActivo.getIndicatorList().set(i, indicadorTecnico);
                     this.repositorioActivos.save(precioActivo);
+
+
                 }
             }
         }
@@ -87,7 +97,7 @@ public class DbSeeder implements CommandLineRunner {
         }
     }
 
-    private Map<String,String> returnMapFromString(String toMap){
+    private Map<String, String> returnMapFromString(String toMap) {
         System.out.println(toMap);
         return null;
     }

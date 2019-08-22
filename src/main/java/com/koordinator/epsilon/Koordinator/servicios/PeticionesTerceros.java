@@ -29,7 +29,9 @@ public class PeticionesTerceros {
     @Autowired
     private RepositorioActivos repositorioActivos;
 
-
+    /**
+     * Para peticiones que requiere datos historicos .
+     **/
     public TechnicalRegistry[][] HDataNombreIntervaloHData(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
@@ -79,7 +81,9 @@ public class PeticionesTerceros {
         this.repositorioActivos.save(resActivo);
         return res;
     }
-
+    /**
+     * Para peticiones que requiere datos historicos y periodo indicador.
+     **/
     public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeriesIntervaloIndicador(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
@@ -128,8 +132,10 @@ public class PeticionesTerceros {
         this.repositorioActivos.save(resActivo);
         return res;
     }
-
-    public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeries(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
+    /**
+     * Para peticiones que requiere datos historicos   y tipo series indicador.
+     **/
+    public TechnicalRegistry[][] HDataNombreIntervaloHDataTipoSeriesSinIntervaloIndicador(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParams) {
         ArrayList<HistoricData> listaDatosHistoricos = historico.getRawHistoricData();
         ArrayList<TechnicalIndicatorWrapper> lista = resActivo.getIndicatorList();
         int resBusquedaIndicador = StaticTools.buscarIndicadorSimpleConSeries(lista, nombreIndicador.toUpperCase(), queryParams.get(intervaloHistorico), queryParams.get(tipoSeriesIndicador));
@@ -157,6 +163,10 @@ public class PeticionesTerceros {
         this.repositorioActivos.save(resActivo);
         return res;
     }
+
+    /**
+     * Para peticiones que requiere datos historicos  , periodo indicador  y tipo series indicador.
+     **/
 
     public TechnicalRegistry[][] HDataNombrePeriodoIntervaloHDataTipoS(HistoricDataWrapper historico, AssetPrice resActivo, String nombreIndicador, Map<String, String> queryParameters) {
 

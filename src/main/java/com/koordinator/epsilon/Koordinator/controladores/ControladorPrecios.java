@@ -287,7 +287,7 @@ public class ControladorPrecios {
             return Optional.of(
                     new RespuestaIndicadorTecnico(200, "Technical result MACD " + historico.get().getPeriod(),
                             historico.map(tipoDatoHistorico ->
-                                    this.peticionesTerceros.HDataNombreIntervaloHDataTipoSeries(tipoDatoHistorico, resActivo.get(), "macd", queryParameters)).orElse(null)));
+                                    this.peticionesTerceros.HDataNombreIntervaloHDataTipoSeriesSinIntervaloIndicador(tipoDatoHistorico, resActivo.get(), "macd", queryParameters)).orElse(null)));
 
 
         } else {
