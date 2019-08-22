@@ -27,6 +27,9 @@ public class TechnicalRegistry {
         this.date = date;
     }
 
+    public TechnicalRegistry() {
+    }
+
     @Override
     public String toString() {
         return "TechnicalRegistry{" +
