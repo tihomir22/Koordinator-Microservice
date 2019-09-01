@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import rx.Observable;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +69,8 @@ public class TALibDemo {
         return null;
     }
 
-    private static void instanciar(double[] list) {
+    private static void instanciar(double [] list) {
+
         close = list;
         lib = new Core();
         input = new double[close.length];
@@ -440,7 +442,8 @@ public class TALibDemo {
     public static TechnicalRegistry[][] TripleExponencialMovingAverage(int periodoTiempo) {
         resetArrayValues();
         lookback = lib.movingAverageLookback(periodoTiempo, MAType.Tema);
-        retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Tema, outBegIdx, outNbElement, output);
+        //retCode = lib.movingAverage(0, close.length - 1, close, lookback + 1, MAType.Tema, outBegIdx, outNbElement, output);
+        retCode=lib.tema(0,close.length-1,close,lib.temaLookback(lookback+1),outBegIdx,outNbElement,output);
         return showFinalOutput("TEMA Registry");
     }
 

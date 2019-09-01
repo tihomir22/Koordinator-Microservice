@@ -1,10 +1,8 @@
 package com.koordinator.epsilon.Koordinator.entidades;
 
-import io.swagger.annotations.ApiModel;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "FormularioContacto")
-@ApiModel(description = "Model for saving the contact data from the website")
 public class FormularioContactoWeb {
     private String nombre;
     private String email;

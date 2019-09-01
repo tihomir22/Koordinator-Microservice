@@ -1,23 +1,13 @@
 package com.koordinator.epsilon.Koordinator.entidades;
 
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description="Raw History data model")
 public class HistoricData {
-    //hourly daily minute etc
-    @ApiModelProperty(notes="Open time of this candle",example = "1563700675 ")
     private String open_time;
-    @ApiModelProperty(notes="Open historical price",example = "10500.20")
     private double open;
-    @ApiModelProperty(notes="High historical price",example = "11770.20")
     private double high;
-    @ApiModelProperty(notes="Low historical price",example = "9575.10")
     private double low;
-    @ApiModelProperty(notes="Close historical price",example = "10665.10")
     private double close;
-    @ApiModelProperty(notes="Volume",example = "3410115.10")
     private double volume;
 
 

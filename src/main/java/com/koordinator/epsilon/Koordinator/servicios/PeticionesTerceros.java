@@ -314,20 +314,53 @@ public class PeticionesTerceros {
 
     }
 
-    public HistoricDataWrapper recibirHistoricoActivo(String parBase, String parContra, String intervalo) throws ActivoNoEncontradoException, JSONException {
-        if (!ValidacionesEstaticas.esIntervaloDeBinance(intervalo)) {
-            throw new ActivoNoEncontradoException("El intervalo introducido " + intervalo + " no es correcto!");
+    private String construirUrl(String nombreActivo,String intervaloHistorico,String startTime,String endTime,int limite){
+        StringBuilder nuevoString=new StringBuilder("https://api.binance.com/api/v1/klines?symbol=");
+        nuevoString.append(nombreActivo.toUpperCase());
+        nuevoString.append("&interval=");
+        nuevoString.append(intervaloHistorico);
+        long unixTime = System.currentTimeMillis();
+        long creacionBitcoin=1230836325000L;
+        if(!startTime.equals("-1") && !startTime.equals("0")){
+            if(Float.parseFloat(startTime)> unixTime){
+                throw new ActivoNoEncontradoException("Incorrect interval, we can't get historic data of the future!");
+            }else if(Float.parseFloat(startTime)< creacionBitcoin){
+                throw new ActivoNoEncontradoException("You are looking for too old entries, even Bitcoin was not created!");
+            }
+            nuevoString.append("&startTime=");
+            nuevoString.append(startTime);
         }
-        final String uri = "https://api.binance.com/api/v1/klines?symbol=" + parBase.toUpperCase() + parContra.toUpperCase() + "&interval=" + intervalo;
+        if(!endTime.equals("-1") && !endTime.equals("0")){
+            if(Float.parseFloat(endTime)> unixTime){
+                throw new ActivoNoEncontradoException("Incorrect interval, we can't get historic data of the future!");
+            }else if(Float.parseFloat(endTime)< creacionBitcoin){
+                throw new ActivoNoEncontradoException("You are looking for too old entries, even Bitcoin was not created!");
+            }
+            nuevoString.append("&endTime=");
+            nuevoString.append(endTime);
+        }
+        nuevoString.append("&limit=");
+        nuevoString.append(limite);
+        return nuevoString.toString();
+    }
+
+    //Parametros opcionales => startTime , endTime , limit
+    public HistoricDataWrapper recibirHistoricoActivo(String parBase, String parContra, String intervalo,String startTime,String endTime,int limit) throws ActivoNoEncontradoException, JSONException {
+        if (!ValidacionesEstaticas.esIntervaloDeBinance(intervalo)) {
+            throw new ActivoNoEncontradoException("The introduced " + intervalo + " is not valid!");
+        }
+        final String uri = this.construirUrl(parBase+parContra,intervalo,startTime,endTime,limit);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<Object> respEntity2 = restTemplate.exchange(uri, HttpMethod.GET, entity, Object.class);
-        ArrayList<HistoricDataWrapper> listaDatosHistoricos = new ArrayList<>();
         JSONArray jsonarray = new JSONArray(respEntity2.getBody().toString());
         HistoricDataWrapper tipoDatoHistorico = new HistoricDataWrapper();
         ArrayList<HistoricData> lista = new ArrayList<>();
         tipoDatoHistorico.setPeriod(intervalo);
+        tipoDatoHistorico.setEndTime(endTime);
+        tipoDatoHistorico.setStartTime(startTime);
+        tipoDatoHistorico.setLimit(limit);
         for (int i = 0; i < jsonarray.length(); i++) {
             Object objeto = jsonarray.get(i);
             String base = objeto.toString().substring(1, objeto.toString().length() - 1);

@@ -1,21 +1,13 @@
 package com.koordinator.epsilon.Koordinator.entidades;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
-@ApiModel(description="Raw Technical Indicator Record")
 public class TechnicalRegistry {
-    @ApiModelProperty(notes="Number of the record , similar to id",example = "1")
     private int numRegistry;
-    @ApiModelProperty(notes="Extra information about the registry", example = "Stoch Registry")
     private String extra;
-    @ApiModelProperty(notes="Historic price attached to the technical indicator registry below",example = "10343.34")
     private double historicPrice;
-    @ApiModelProperty(notes="Technical indicator registry",example = "10255.14")
     private double technicalIndicator;
-    @ApiModelProperty(notes="Date of the technical registry ", example = "1563700393")
     private Date date;
 
 

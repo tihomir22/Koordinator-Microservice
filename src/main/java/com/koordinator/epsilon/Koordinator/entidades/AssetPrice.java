@@ -1,34 +1,25 @@
 package com.koordinator.epsilon.Koordinator.entidades;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 
 @Document(collection = "PreciosActivos")
-@ApiModel(description="Model for retrieving general price-data about a cryptocurrency")
 public class AssetPrice {
-    //compuesto por dos activos
-    @Id
-    @ApiModelProperty(notes="Id of the asset, formed by the base pair with his counter",example = "BTCUSDT")
-    private String id;
-    @ApiModelProperty(notes="Live price of the asset",example = "10523,23")
+   @Id
+   private String id;
     private double price;
     @JsonIgnore
-    @ApiModelProperty(notes="Records of historic wrapped data",example = "[{ period : 1h , numRecords : 500 , rawHistoricData : [{ open_time: 1563698748 , open : 20.2 , high : 24.8 , low : 19.8 , close : 22.1 , volume : 2343553 },]}]")
-    private ArrayList<HistoricDataWrapper> historicData =new ArrayList<>();
+   private ArrayList<HistoricDataWrapper> historicData =new ArrayList<>();
     @JsonIgnore
-    @ApiModelProperty(notes="Base pair of the asset",example = "BTC")
     private String basePair;
     @JsonIgnore
-    @ApiModelProperty(notes="Counter pair of the asset",example = "USDT")
     private String counterPair;
     @JsonIgnore
-    @ApiModelProperty(notes="Records of technical indicators associated with the cryptocurrency",example = "USD")
-    private ArrayList<TechnicalIndicatorWrapper> indicatorList =new ArrayList<>();
+   private ArrayList<TechnicalIndicatorWrapper> indicatorList =new ArrayList<>();
 
 
     public AssetPrice(String id, double price, ArrayList<HistoricDataWrapper> historicData, String basePair, String counterPair, ArrayList<TechnicalIndicatorWrapper> indicatorList) {

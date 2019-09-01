@@ -88,7 +88,7 @@ public class DbSeeder implements CommandLineRunner {
         if (precioActivo.getHistoricData() != null && precioActivo.getHistoricData().size() > 0) {
             for (int i = 0; i < precioActivo.getHistoricData().size(); i++) {
                 HistoricDataWrapper tipo = precioActivo.getHistoricData().get(i);
-                CompletableFuture completableFuture = CompletableFuture.completedFuture(this.peticionesTerceros.recibirHistoricoActivo(precioActivo.getBasePair(), precioActivo.getCounterPair(), tipo.getPeriod()));
+                CompletableFuture completableFuture = CompletableFuture.completedFuture(this.peticionesTerceros.recibirHistoricoActivo(precioActivo.getBasePair(), precioActivo.getCounterPair(), tipo.getPeriod(), tipo.getStartTime(),tipo.getEndTime(),tipo.getLimit()));
                 completableFuture.join();
                 HistoricDataWrapper tipoRes = (HistoricDataWrapper) completableFuture.get();
                 precioActivo.modificarItemTipoHistoricoLista(i, tipoRes);

@@ -135,7 +135,7 @@ public class OperadorTernarioJS {
         }
     }
 
-    static String getSeriesTypeDefault(Map<String, String> queryparams) {
+    public static String getSeriesTypeDefault(Map<String, String> queryparams) {
         if (queryparams.get(ValidacionesEstaticas.tipoSeriesIndicador) != null) {
             return queryparams.get(ValidacionesEstaticas.tipoSeriesIndicador);
         } else {
@@ -143,11 +143,35 @@ public class OperadorTernarioJS {
         }
     }
 
-    static int getIndicatorIntervalDefault(Map<String, String> queryparams) {
+    public static int getIndicatorIntervalDefault(Map<String, String> queryparams) {
         if (queryparams.get(ValidacionesEstaticas.intervaloPeriodoIndicador) != null && NumberUtils.isCreatable(queryparams.get(ValidacionesEstaticas.MACDsignalPeriod))) {
             return Integer.parseInt(queryparams.get(ValidacionesEstaticas.intervaloPeriodoIndicador));
         } else {
             return -1;
+        }
+    }
+
+    public static String obtenerStartTime(Map<String,String>queryParams){
+        if(queryParams.get(ValidacionesEstaticas.HistoricStartTime)!=null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.HistoricStartTime))){
+            return (queryParams.get(ValidacionesEstaticas.HistoricStartTime));
+        }else{
+            return "-1";
+        }
+    }
+
+    public static String obtenerEndTime(Map<String,String>queryParams){
+        if(queryParams.get(ValidacionesEstaticas.HistoricEndTime)!=null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.HistoricEndTime))){
+            return queryParams.get(ValidacionesEstaticas.HistoricEndTime);
+        }else{
+            return "-1";
+        }
+    }
+
+    public static int obtenerLimit(Map<String,String>queryParams){
+        if(queryParams.get(ValidacionesEstaticas.HistoricLimit)!=null && NumberUtils.isCreatable(queryParams.get(ValidacionesEstaticas.HistoricLimit))){
+            return Integer.parseInt(queryParams.get(ValidacionesEstaticas.HistoricLimit));
+        }else{
+            return 1000;
         }
     }
 

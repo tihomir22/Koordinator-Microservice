@@ -3,6 +3,7 @@ package com.koordinator.epsilon.Koordinator;
 import com.koordinator.epsilon.Koordinator.entidades.HistoricDataWrapper;
 import com.koordinator.epsilon.Koordinator.entidades.TechnicalIndicatorWrapper;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -10,6 +11,15 @@ public class StaticTools {
     public static int buscarIntervalo(ArrayList<HistoricDataWrapper> lista, String intervalo) {
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getPeriod().equals(intervalo)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int busquedaHistoricoCompleta(ArrayList<HistoricDataWrapper>lista,String intervalo,String startTime,String endTime,int limit){
+        for (int i = 0; i < lista.size(); i++) {
+            if(lista.get(i).getPeriod().equals(intervalo) && lista.get(i).getStartTime().equals(startTime) && lista.get(i).getEndTime().equals(endTime) && lista.get(i).getLimit()==limit){
                 return i;
             }
         }
